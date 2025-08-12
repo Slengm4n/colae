@@ -19,7 +19,9 @@
     <h1>Mapa com Leaflet</h1>
     <div id="mapaId"></div>
 
-    
+    <form action="../services/logout.php">
+        <button>Logout</button>
+    </form>
 <script src="../assets/scripts/Map.js"></script>
 </body>
 </html>

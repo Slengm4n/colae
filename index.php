@@ -1,62 +1,41 @@
 <?php
-    // Iniciar a sessão
 session_start();
 
-    // Verificar se o usuário está logado, e se estiver redireciona para a home (usuário comum)
-if (isset($_SESSION["user_id"])) {
-    header("Location: /public/home.php");
-    exit;
-}
-
-function checkAdmin(){
-    session_start();
-    if (!isset($_SESSION["user_id"]) || $_SESSION["user_role"] !== 'admin'){
-        header("Location: /acess_denied.php");
-        exit;
-    }
-}
-
-    // Verificar se o formulário foi submetido
+// Verificar se o formulário foi submetido
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $mysqli = require __DIR__ . "/config/database/db.php";
 
- 
-    $identifier = $_POST["identifier"];
+    $identifier = trim($_POST["identifier"]);
     $password = $_POST["password"];
     
-    // Preparar a consulta
-    $stmt = $mysqli->prepare("SELECT id, name, email, password_hash FROM users WHERE email = ? OR name = ?");
-    
-    // Vincular os parâmetros
+    // Consulta para buscar usuário por email ou nome
+    $stmt = $mysqli->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ? OR name = ?");
     $stmt->bind_param("ss", $identifier, $identifier);
-    
-    // Executar a consulta
     $stmt->execute();
     
-    // Obter o resultado
     $result = $stmt->get_result();
     
-    if ($result->num_rows > 0) {
+    if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
         
         // Verificar a senha
         if (password_verify($password, $user["password_hash"])) {
-            // Iniciar a sessão e definir o ID do usuário
-            // Verifica 
-            $_SESSION["user_id"] = $user["id"];
-            $_SESSION["user_role"] = $user["role"];      
+            // Configurar sessão
+            $_SESSION["user_id"] = $user["id"];;
+            $_SESSION["user_role"] = $user["role"];
             
-            // Redirecionar para a página inicial
-            header("Location: ./public/home.php");
+            // Redirecionar conforme o tipo de usuário
+            if ($user["role"] === "admin") {
+                header("Location: admin/home_admin.php");
+            } else {
+                header("Location: public/home.php");
+            }
             exit;
-        } else {
-            $invalid_login = true;
         }
-    } else {
-        $invalid_login = true;
     }
     
-    // Fechar a consulta
+    // Se chegou aqui, o login falhou
+    $invalid_login= true;
     $stmt->close();
 }
 ?>
