@@ -1,8 +1,13 @@
-
 <?php
-require_once __DIR__ . '/../config/auth.php';
-require_once __DIR__ . '/../logs/logger.php';
+require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/../../logs/logger.php';
 checkAdmin();
+
+if ($_SESSION['user_role'] !== 'admin') {
+    logMessage("Tentativa de acesso não autorizado ao dashboard", 'SECURITY');
+    header('Location: /public/403.php');
+    exit;
+}
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

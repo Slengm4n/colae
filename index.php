@@ -21,9 +21,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Verificar a senha
         if (password_verify($password, $user["password_hash"])) {
             // Configurar sessão
+            //Segurança extra
+            session_regenerate_id(true);
             $_SESSION["user_id"] = $user["id"];;
             $_SESSION["user_role"] = $user["role"];
             
+            //Fechar o statement antes de redirecionar
+            $stmt->close();
+
             // Redirecionar conforme o tipo de usuário
             if ($user["role"] === "admin") {
                 header("Location: admin/home_admin.php");
@@ -67,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <form action="services/signup.php" method="post" class="sign-up-form">
                         <input type="text" id="signup_name" name="name" placeholder="Nome de usuário" required>
                         <input type="email" id="signup_email" name="email" placeholder="Email" required>
-                        <input type="date" id="signup_birthdate" name="birthdate" placeholder="RM" required>
+                        <input type="date" id="signup_birthdate" name="birthdate" placeholder="Aniversario" required>
                         <input type="password" id="signup_password" name="password" placeholder="Senha" required>
                         <input type="password" id="signup_password_confirmation" name="password_confirmation" placeholder="Confirme sua senha" required>
                         <input type="submit" class="btn" value="Cadastrar" />

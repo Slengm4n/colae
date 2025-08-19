@@ -19,7 +19,7 @@ function getTotalUsers() {
 
 function getTotalModalities() {
     global $mysqli;
-    $result = $mysqli->query("SELECT COUNT(*) as total FROM modalities");
+    $result = $mysqli->query("SELECT COUNT(*) as total FROM sports");
     return $result->fetch_assoc()['total'];
 
 }
@@ -54,13 +54,13 @@ function getTotalModalities() {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="users.php">
+                            <a class="nav-link text-white" href="./users/index.php">
                                 <i class="bi bi-people me-2"></i>Gerenciar Usuários
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="modalities.php">
-                                <i class="bi bi-trophy me-2"></i>Modalidades Esportivas
+                            <a class="nav-link text-white" href="./sports/index.php">
+                                <i class="bi bi-trophy me-2"></i>Modalidades Esportivas 
                             </a>
                         </li>
                         <li class="nav-item">
@@ -92,9 +92,9 @@ function getTotalModalities() {
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card bg-success text-white h-100" onclick="window.location='modalities.php'">
+                        <div class="card bg-success text-white h-100" onclick="window.location='./sports/index.php'">
                             <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-trophy"></i> Modalidades</h5>
+                                <h5 class="card-title"><i class="bi bi-trophy"></i> Modalidades Esportivas</h5>
                                 <p class="card-text">Total: <?= getTotalModalities() ?></p>
                             </div>
                         </div>

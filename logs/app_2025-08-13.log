@@ -18,3 +18,53 @@
 [2025-08-13 00:53:43] SECURITY: Tentativa de acesso não autorizado: /colae/public/403.php
 [2025-08-13 00:54:04] SECURITY: Tentativa de acesso não autorizado: /colae/public/403.php
 [2025-08-13 00:54:33] SECURITY: Tentativa de acesso não autorizado: /colae/public/403.php
+[2025-08-13 04:21:05] SECURITY: Tentativa de acesso não autorizado: /colae/public/403.php
+[2025-08-13 04:39:00] INFO: Modalidade 'Trilha esportiva' cadastrada por admin ID: 6
+[2025-08-13 04:39:03] INFO: Modalidade 'Trilha esportiva' cadastrada por admin ID: 6
+[2025-08-13 19:17:24] SECURITY: Tentativa de acesso não autorizado: /colae/public/403.php
+[2025-08-13 22:51:26] INFO: Acessou a lista de usuários
+[2025-08-13 22:51:52] INFO: Acessou a lista de usuários
+[2025-08-13 22:51:58] INFO: Acessou a lista de usuários
+[2025-08-13 22:53:10] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:53:10] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:53:35] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:54:49] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:56:42] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:57:06] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:57:25] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 22:58:50] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:00:01] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:00:17] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:00:33] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:02:17] SECURITY: Tentativa de acesso não autorizado: /colae///public/403.php
+[2025-08-13 23:03:53] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:04:31] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:04:31] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:05:59] INFO: Usuário com ID 7 foi excluído com sucesso.
+[2025-08-13 23:06:22] WARN: Falha ao excluir o usuário com ID 7 (ID não encontrado).
+[2025-08-13 23:06:48] WARN: Falha ao excluir o usuário com ID 7 (ID não encontrado).
+[2025-08-13 23:06:55] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:06:57] INFO: Usuário com ID 5 foi excluído com sucesso.
+[2025-08-13 23:06:57] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:07:27] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:07:29] INFO: Usuário com ID 8 foi excluído com sucesso.
+[2025-08-13 23:07:29] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:08:05] WARN: Tentativa de exclusão de usuário sem ID.
+[2025-08-13 23:08:33] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:08:37] WARN: Tentativa de exclusão de usuário sem ID.
+[2025-08-13 23:08:49] WARN: Tentativa de exclusão de usuário sem ID.
+[2025-08-13 23:10:38] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:10:43] SECURITY: Tentativa de acesso não autorizado ao dashboard
+[2025-08-13 23:10:43] SECURITY: Tentativa de acesso não autorizado ao dashboard
+[2025-08-13 23:11:11] SECURITY: Tentativa de acesso não autorizado ao dashboard
+[2025-08-13 23:11:11] SECURITY: Tentativa de acesso não autorizado ao dashboard
+[2025-08-13 23:11:21] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:11:43] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:11:44] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:11:47] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:12:03] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:14:41] SECURITY: Tentativa de acesso não autorizado ao dashboard
+[2025-08-13 23:15:17] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:15:20] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:16:40] INFO: Acessou a lista de usuários, acessada por admin ID: 6
+[2025-08-13 23:16:44] INFO: Acessou a lista de usuários, acessada por admin ID: 6
