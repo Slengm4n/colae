@@ -5,9 +5,12 @@ require_once '../app/core/Database.php';
 class UserController
 {
 
+
+
     public function index()
     {
         try {
+
 
             $users = User::getAll();
 
@@ -20,29 +23,6 @@ class UserController
 
     public function create()
     {
-
-        $pdo = Database::getConnection();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validação básica
-            if (empty($_POST['name']) || empty($_POST['email']) || empty($_POST['password'])) {
-                $error = "Todos os campos são obrigatórios";
-                require __DIR__ . '/../views/users/create.php';
-                return;
-            }
-
-            $pdo->user->name = htmlspecialchars($_POST['name']);
-            $pdo->user->email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-            $pdo->user->birthdate = $_POST['birthdate'];
-            $pdo->user->password_hash = password_hash($_POST['password'], PASSWORD_BCRYPT);
-
-            if ($pdo->user->create()) {
-                header("Location: index.php?action=index");
-                exit;
-            } else {
-                $error = "Erro ao criar usuário";
-            }
-        }
         require __DIR__ . '/../views/users/create.php';
     }
 
@@ -89,7 +69,6 @@ class UserController
 
     public function show($id)
     {
-
         $pdo = Database::getConnection();
 
         $pdo->user->id = $id;
@@ -98,6 +77,36 @@ class UserController
         } else {
             header("Location: index.php?action=index");
             exit;
+        }
+    }
+
+    //Função para salvar a requisição POST do formulário de cadastro
+    public function store()
+    {
+        if (
+            !isset($_POST['name']) || empty($_POST['name']) ||
+            !isset($_POST['email']) || empty($_POST['email']) ||
+            !isset($_POST['birthdate']) || empty($_POST['birthdate']) ||
+            !isset($_POST['password']) || empty($_POST['password'])
+        ) {
+            echo "Todos os campos são obrigatórios.";
+            return;
+        }
+
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $birthdate = $_POST['birthdate'];
+        $password = $_POST['password'];
+
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+        $success = User::create($name, $email, $birthdate, $password_hash);
+
+        if ($success) {
+            echo "Usuario criado com sucesso!";
+            exit;
+        } else {
+            echo "Erro ao criar usuário.";
         }
     }
 }

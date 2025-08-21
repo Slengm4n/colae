@@ -1,6 +1,6 @@
 <h2>Lista de Usuários</h2>
 
-<a href="../usuarios/criar" class="btn btn-primary">Novo Usuário</a>
+<a href="http://localhost/colae/usuarios/criar" class="btn btn-primary">Novo Usuário</a>
 
 <table class="table">
     <thead>
@@ -17,7 +17,6 @@
     </thead>
     <tbody>
         <?php
-
         if ($users && count($users) > 0):
             foreach ($users as $row):
         ?>
@@ -30,9 +29,9 @@
                     <td><?php echo htmlspecialchars($row['status']); ?></td>
                     <td><?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?></td>
                     <td>
-                        <a href="index.php?action=show&id=<?php echo $row['id']; ?>" class="btn btn-info">Ver</a>
+                        <a href="http://localhost/colae/usuarios/editar&id=<?php echo $row['id']; ?>" class="btn btn-info">Ver</a>
                         <a href="index.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-warning">Editar</a>
-                        <a href="index.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Tem certeza?')">Excluir</a>
+                        <a href="http://localhost/colae/usuairos/action=delete&id=<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Tem certeza?')">Excluir</a>
                     </td>
                 </tr>
             <?php

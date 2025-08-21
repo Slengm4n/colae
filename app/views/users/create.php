@@ -1,13 +1,3 @@
-<?php
-session_start();
-
-// Verificar se o formulário foi submetido
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $mysqli = require __DIR__ . "/config/database/db.php";
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -18,10 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 
 <body>
-    <!--Caso o login esteja inválido-->
 
     <!-- Formulário de Cadastro -->
-    <form method="post" class="sign-up-form">
+    <form action="http://localhost/colae/usuarios/salvar" method="post"" class=" sign-up-form">
         <input type="text" id="signup_name" name="name" placeholder="Nome de usuário" required>
         <input type="email" id="signup_email" name="email" placeholder="Email" required>
         <input type="date" id="signup_birthdate" name="birthdate" placeholder="Aniversario" required>

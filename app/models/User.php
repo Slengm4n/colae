@@ -9,8 +9,12 @@ class User
     public static function getAll()
     {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC");
-        return $stmt->fetchAll();
+
+        $query = ("SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC");
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -18,7 +22,7 @@ class User
     {
         $pdo = Database::getConnection();
 
-        $query = "INSERT INTO  (name, email, birthdate, password_hash, status) VALUES (:name, :email, :birthdate, :password_hash, 'active')";
+        $query = "INSERT INTO users (name, email, birthdate, password_hash, status) VALUES (:name, :email, :birthdate, :password_hash, 'active')";
         $stmt = $pdo->prepare($query);
 
         $stmt->bindParam(':name', $name);
