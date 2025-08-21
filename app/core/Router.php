@@ -4,11 +4,6 @@ class Router
 {
     private $routes = [];
 
-    private function addRoute($method, $path, $handler)
-    {
-        $this->routes[strtoupper($method)][$path] = $handler;
-    }
-
     public function get($path, $handler)
     {
         $this->addRoute('GET', $path, $handler);
@@ -19,33 +14,60 @@ class Router
         $this->addRoute('POST', $path, $handler);
     }
 
+    private function addRoute($method, $path, $handler)
+    {
+        $this->routes[strtoupper($method)][$path] = $handler;
+    }
+
     public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        $path = '/' . trim($_GET['url'] ?? '', '/');
+        
+        // Lê a URI corretamente, sem depender de $_GET['url']
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        $handler = $this->routes[$method][$path] ?? null;
+        // Remove a pasta base do projeto da URI
+        $basePath = '/colae';
+        if (strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath));
+        }
+        
+        if (strlen($uri) > 1) {
+            $uri = rtrim($uri, '/');
+        }
 
-        if ($handler) {
-            if (is_callable($handler)) {
-                call_user_func($handler);
-            } elseif (is_array($handler) && class_exists($handler[0])) {
-                $controller = new $handler[0]();
-                $methodName = $handler[1];
-                if (method_exists($controller, $methodName)) {
-                    $controller->$methodName();
-                } else {
-                    $this->sendNotFound();
+        $uri = empty($uri) ? '/' : $uri;
+
+        // Lógica para encontrar a rota, incluindo parâmetros dinâmicos
+        foreach ($this->routes[$method] as $routePath => $handler) {
+            $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_]+)', $routePath);
+            $pattern = '#^' . $pattern . '$#';
+
+            if (preg_match($pattern, $uri, $matches)) {
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+                if (is_callable($handler)) {
+                    call_user_func_array($handler, $params);
+                    return;
+                }
+
+                if (is_array($handler) && class_exists($handler[0])) {
+                    $controller = new $handler[0]();
+                    $methodName = $handler[1];
+                    if (method_exists($controller, $methodName)) {
+                        call_user_func_array([$controller, $methodName], $params);
+                        return;
+                    }
                 }
             }
-        } else {
-            $this->sendNotFound();
         }
+
+        $this->sendNotFound();
     }
 
     private function sendNotFound()
     {
         http_response_code(404);
-        echo "<h1>404 - Página não encontrada</h1>";
+        echo "<h1>404 - Página não encontrada pelo Roteador</h1>";
     }
 }

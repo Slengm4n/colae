@@ -5,12 +5,18 @@ require_once '../app/core/Database.php';
 
 class User
 {
+    //Variaveis publicas para armazenar os dados do usuario
+    public $id;
+    public $name;
+    public $email;
+    public $birthdate;
+    public $role;
 
     public static function getAll()
     {
         $pdo = Database::getConnection();
 
-        $query = ("SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC");
+        $query = "SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
 
@@ -33,14 +39,25 @@ class User
         return $stmt->execute();
     }
 
-    public function readOne()
+    public function readOne($id)
     {
         $pdo = Database::getConnection();
 
-        $query = "SELECT * FROM WHERE id = :id";
+        $query = "SELECT * FROM users WHERE id = :id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $pdo->id);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
+
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($userData) {
+            $this->id = $userData['id'];
+            $this->name = $userData['name'];
+            $this->email = $userData['email'];
+            $this->birthdate = $userData['birthdate'];
+        }
+
+        return $userData;
     }
 
     public function update()
@@ -48,26 +65,23 @@ class User
 
         $pdo = Database::getConnection();
 
-        $query = "UPDATE SET name = :name, email = :email, birthdate = :birthdate, role = :role WHERE id = :id";
+        $query = "UPDATE users SET name = :name, email = :email, birthdate = :birthdate WHERE id = :id";
         $stmt = $pdo->prepare($query);
 
-        $stmt->bindParam(':id', $pdo->id);
-        $stmt->bindParam(':name', $pdo->name);
-        $stmt->bindParam(':email', $pdo->email);
-        $stmt->bindParam(':birthdate', $pdo->birthdate);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':birthdate', $this->birthdate);
 
-        return $pdo->execute();
+        return $stmt->execute();
     }
 
-    public function delete()
+    public static function delete($id)
     {
-
         $pdo = Database::getConnection();
-
-        return $pdo->execute();
-        $query = "UPDATE  SET status = 'inactive' WHERE id = :id";
+        $query = "UPDATE users SET status = 'inactive' WHERE id = :id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $pdo->id);
+        $stmt->bindParam(':id', $id);
 
         return $stmt->execute();
     }

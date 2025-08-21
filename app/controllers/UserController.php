@@ -1,24 +1,12 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
-require_once '../app/core/Database.php';
 
 class UserController
 {
-
-
-
     public function index()
     {
-        try {
-
-
-            $users = User::getAll();
-
-            require __DIR__ . '/../views/users/index.php';
-        } catch (Exception $e) {
-            error_log("Erro ao listar usuários: " . $e->getMessage());
-            require __DIR__ . '/../views/error.php';
-        }
+        $users = User::getAll();
+        require __DIR__ . '/../views/users/index.php';
     }
 
     public function create()
@@ -26,87 +14,56 @@ class UserController
         require __DIR__ . '/../views/users/create.php';
     }
 
-    public function edit($id)
+    public function store()
     {
-        $pdo = Database::getConnection();
-
-        $pdo->user->id = $id;
-
-        if (!$pdo->user->readOne()) {
-            header("Location: index.php?action=index");
-            exit;
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $pdo->user->name = htmlspecialchars($_POST['name']);
-            $pdo->user->email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-            $pdo->user->birthdate = $_POST['birthdate'];
-
-            if ($pdo->user->update()) {
-                header("Location: index.php?action=index");
+            $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            if (User::create($_POST['name'], $_POST['email'], $_POST['birthdate'], $password_hash)) {
+                header('Location: /colae/usuarios');
                 exit;
             } else {
-                $error = "Erro ao atualizar usuário";
+                echo "Erro ao criar usuário.";
             }
+        }
+    }
+
+    public function edit($id)
+    {
+        $user = new User();
+        $userData = $user->readOne($id);
+        if (!$userData) {
+            header("Location: /colae/usuarios");
+            exit;
         }
         require __DIR__ . '/../views/users/edit.php';
     }
 
+    public function update()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+            $user = new User();
+            $user->id = $_POST['id'];
+            $user->name = htmlspecialchars($_POST['name']);
+            $user->email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            $user->birthdate = $_POST['birthdate'];
+
+            if ($user->update()) {
+                header('Location: /colae/usuarios');
+                exit;
+            } else {
+                header("Location: /colae/usuarios/editar/" . $_POST['id'] . "?status=erro");
+                exit;
+            }
+        }
+    }
+
     public function delete($id)
     {
-
-        $pdo = Database::getConnection();
-
-        $pdo->user->id = $id;
-        if ($pdo->user->delete()) {
-            header("Location: index.php?action=index");
+        if (User::delete($id)) {
+            header("Location: /colae/usuarios");
             exit;
         } else {
-            header("Location: index.php?action=index&error=delete_failed");
-            exit;
-        }
-    }
-
-    public function show($id)
-    {
-        $pdo = Database::getConnection();
-
-        $pdo->user->id = $id;
-        if ($pdo->user->readOne()) {
-            require __DIR__ . '/../views/users/show.php';
-        } else {
-            header("Location: index.php?action=index");
-            exit;
-        }
-    }
-
-    //Função para salvar a requisição POST do formulário de cadastro
-    public function store()
-    {
-        if (
-            !isset($_POST['name']) || empty($_POST['name']) ||
-            !isset($_POST['email']) || empty($_POST['email']) ||
-            !isset($_POST['birthdate']) || empty($_POST['birthdate']) ||
-            !isset($_POST['password']) || empty($_POST['password'])
-        ) {
-            echo "Todos os campos são obrigatórios.";
-            return;
-        }
-
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $birthdate = $_POST['birthdate'];
-        $password = $_POST['password'];
-
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-        $success = User::create($name, $email, $birthdate, $password_hash);
-
-        if ($success) {
-            echo "Usuario criado com sucesso!";
-            exit;
-        } else {
-            echo "Erro ao criar usuário.";
+            echo "Erro ao excluir usuário.";
         }
     }
 }
