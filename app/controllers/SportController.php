@@ -32,7 +32,7 @@ class SportController
     {
         $sport = new Sport;
         $sportData = $sport->readOne($id);
-        if ($sportData) {
+        if (!$sportData) {
             header("Location: /colae/esportes");
             exit;
         }
@@ -41,10 +41,10 @@ class SportController
 
     public function update()
     {
-        if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['id'])) {
+        if ($_SERVER["REQUEST_METHOD"] === 'POST' && isset($_POST['id'])) {
             $sport = new Sport();
             $sport->id = $_POST['id'];
-            $sport->name = $_POST['name'];
+            $sport->name = htmlspecialchars($_POST['name']);
 
             if ($sport->update()) {
                 header('Location: /colae/esportes');

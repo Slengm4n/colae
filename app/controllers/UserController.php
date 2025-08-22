@@ -1,21 +1,25 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../core/AuthHelper.php';
 
 class UserController
 {
     public function index()
     {
+        AuthHelper::check();
         $users = User::getAll();
         require __DIR__ . '/../views/users/index.php';
     }
 
     public function create()
     {
+        AuthHelper::checkAdmin();
         require __DIR__ . '/../views/users/create.php';
     }
 
     public function store()
     {
+        AuthHelper::checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
             if (User::create($_POST['name'], $_POST['email'], $_POST['birthdate'], $password_hash)) {
@@ -29,6 +33,7 @@ class UserController
 
     public function edit($id)
     {
+        AuthHelper::checkAdmin();
         $user = new User();
         $userData = $user->readOne($id);
         if (!$userData) {
@@ -40,6 +45,7 @@ class UserController
 
     public function update()
     {
+        AuthHelper::checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             $user = new User();
             $user->id = $_POST['id'];
@@ -59,6 +65,7 @@ class UserController
 
     public function delete($id)
     {
+        AuthHelper::checkAdmin();
         if (User::delete($id)) {
             header("Location: /colae/usuarios");
             exit;

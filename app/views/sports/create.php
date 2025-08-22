@@ -10,7 +10,7 @@
 <body>
 
     <!-- Formulário de Cadastro -->
-    <form action="http://localhost/colae/esporte/salvar" method="post" class=" sign-up-form">
+    <form action="http://localhost/colae/esportes/salvar" method="post" class=" sign-up-form">
         <input type="text" id="signup_name" name="name" placeholder="Nome do esporte" required>
         <input type="submit" class="btn" value="Cadastrar" />
     </form>

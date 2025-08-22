@@ -17,7 +17,7 @@ class Sport
         $pdo = Database::getConnection();
 
         $query = "SELECT * FROM sports WHERE status = 'active' ORDER BY created_at DESC";
-        $stmt = $pdo->prepare($query);
+        $stmt = $pdo->prepare($query) ;
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -27,7 +27,7 @@ class Sport
     {
         $pdo = Database::getConnection();
 
-        $query = "INSERT INTO sports (name) VALUES (:name, 'active')";
+        $query = "INSERT INTO sports (name, status) VALUES (:name, 'active')";
         $stmt = $pdo->prepare($query);
 
         $stmt->bindParam(":name", $name);
@@ -40,7 +40,7 @@ class Sport
 
         $pdo = Database::getConnection();
 
-        $query = "SELECT * FROM sportes WHERE id = :id";
+        $query = "SELECT * FROM sports WHERE id = :id";
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();

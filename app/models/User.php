@@ -85,4 +85,15 @@ class User
 
         return $stmt->execute();
     }
+
+    public function findByEmail($email){
+
+        $pdo = Database::getConnection();
+        $query = "SELECT * FROM users WHERE email = :email AND status = 'active'";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':email' , $email);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

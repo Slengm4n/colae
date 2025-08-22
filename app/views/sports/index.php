@@ -20,8 +20,8 @@
         <td><?php echo htmlspecialchars($row['name']);?></td>
         <td><?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?></td>
         <td>
-            <a href="http://localhost/esportes/editar/<?php echo $row['id']; ?>">Editar</a>
-            <a href="http://localhost/esporte/excluir/<?php echo $row['id']; ?>">Excluir</a>
+            <a href="http://localhost/colae/esportes/editar/<?php echo $row['id']; ?>">Editar</a>
+            <a href="http://localhost/colae/esportes/excluir/<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Tem certeza?')">Excluir</a>
         </td>
     </tr>
     <?php
