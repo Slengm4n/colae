@@ -4,11 +4,21 @@ require_once __DIR__ . '/../core/AuthHelper.php';
 
 class UserController
 {
+
+    public function dashboard()
+    {
+        // Apenas usuários logados podem acessar esta página
+        AuthHelper::check();
+
+        // Carrega a view do painel do usuário
+        require_once BASE_PATH . '/app/views/users/dashboard.php';
+    }
+
     public function index()
     {
         AuthHelper::check();
         $users = User::getAll();
-        require __DIR__ . '/../views/users/index.php';
+        require BASE_PATH . '/app/views/users/index.php';
     }
 
     public function create()

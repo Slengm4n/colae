@@ -86,14 +86,48 @@ class User
         return $stmt->execute();
     }
 
-    public function findByEmail($email){
+    public static function findByEmail($email)
+    {
 
         $pdo = Database::getConnection();
         $query = "SELECT * FROM users WHERE email = :email AND status = 'active'";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':email' , $email);
+        $stmt->bindParam(':email', $email);
         $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function savePasswordResetToken($email, $token, $expires_at)
+    {
+        $pdo = Database::getConnection();
+        $sql = "INSERT INTO password_resets (email, token, expires_at) VALUES (:email, :token, :expires_at)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['email' => $email, 'token' => $token, 'expires_at' => $expires_at]);
+    }
+
+    public static function findResetToken($token)
+    {
+        $pdo = Database::getConnection();
+        $sql = "SELECT * FROM password_resets WHERE token = :token";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function updatePassword($email, $password_hash)
+    {
+        $pdo = Database::getConnection();
+        $sql = "UPDATE users SET password_hash = :password_hash WHERE email = :email";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['password_hash' => $password_hash, 'email' => $email]);
+    }
+
+    public static function deleteResetToken($token)
+    {
+        $pdo = Database::getConnection();
+        $sql = "DELETE FROM password_resets WHERE token = :token";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['token' => $token]);
     }
 }
