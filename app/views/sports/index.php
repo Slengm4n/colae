@@ -1,6 +1,7 @@
 <h2>Lista de esportes cadastrados</h2>
 
 <a href="http://localhost/colae/esportes/criar">Cadastrar esporte</a>
+<a href="http://localhost/colae/admin">Voltar</a>
 
 <table class="table">
     <thead>

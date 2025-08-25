@@ -1,17 +1,17 @@
 <?php
+// Inclui o autoload do Composer.
 require_once BASE_PATH . '/vendor/autoload.php';
-// Certifique-se de que os caminhos para os arquivos estão corretos
+
 require_once BASE_PATH . '/app/models/User.php';
 require_once BASE_PATH . '/app/core/AuthHelper.php';
 
+// Usa as classes do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
 
 class AuthController
 {
-    /**
-     * Mostra a página de login.
-     */
     public function index()
     {
         require_once BASE_PATH . '/app/views/auth/login.php';
@@ -42,11 +42,9 @@ class AuthController
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
 
-                // Se for admin, redireciona para o dashboard, senão para a home
                 if ($user['role'] === 'admin') {
                     header('Location: ' . BASE_URL . '/admin');
                 } else {
-                    // Futuramente, pode ser um painel do usuário
                     header('Location: ' . BASE_URL . '/dashboard');
                 }
                 exit;
@@ -75,9 +73,9 @@ class AuthController
             }
 
             if (User::findByEmail($email)) {
-                $error = "Este e-mail já está cadastrado.";
-                require_once BASE_PATH . '/app/views/auth/register.php';
-                return;
+                 $error = "Este e-mail já está cadastrado.";
+                 require_once BASE_PATH . '/app/views/auth/register.php';
+                 return;
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -91,7 +89,7 @@ class AuthController
             }
         }
     }
-
+    
     /**
      * Efetua o logout do usuário.
      */
@@ -109,43 +107,48 @@ class AuthController
         require_once BASE_PATH . '/app/views/auth/forgot_password.php';
     }
 
+    /**
+     * Processa a solicitação de redefinição de senha.
+     */
     public function sendResetLink()
     {
-        $email = $_POST['email'];
-        $user = User::findByEmail($email);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'];
+            $user = User::findByEmail($email);
 
-        if ($user) {
-            // Gera um token seguro
-            $token = bin2hex(random_bytes(32));
-            $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            if ($user) {
+                $token = bin2hex(random_bytes(32));
+                $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                User::savePasswordResetToken($email, $token, $expires_at);
+                $this->sendPasswordResetEmail($email, $token);
+            }
 
-            // Salva o token no banco de dados
-            User::savePasswordResetToken($email, $token, $expires_at);
-
-            // Envia o e-mail com o link de redefinição
-            $this->sendPasswordResetEmail($email, $token);
+            $message = "Se uma conta com este e-mail existir, um link de recuperação foi enviado.";
+            $status = "success";
+            require_once BASE_PATH . '/app/views/auth/forgot_password.php';
         }
-
-        // Mostra uma mensagem de sucesso para o usuário, mesmo que o e-mail não exista
-        // Isso evita que alguém descubra quais e-mails estão cadastrados
-        $message = "Se uma conta com este e-mail existir, um link de recuperação foi enviado.";
-        $status = "success";
-        require_once BASE_PATH . '/app/views/auth/forgot_password.php';
     }
 
+    /**
+     * Mostra o formulário para redefinir a senha, validando o token.
+     */
     public function showResetPasswordForm()
     {
         $token = $_GET['token'] ?? '';
         $reset_data = User::findResetToken($token);
 
-        // Verifica se o token é válido e não expirou
         if (!$reset_data || strtotime($reset_data['expires_at']) < time()) {
-            die("Token inválido ou expirado. Por favor, solicite um novo link de recuperação.");
+            $error = "Token inválido ou expirado. Por favor, solicite um novo link de recuperação.";
+            require_once BASE_PATH . '/app/views/error.php';
+            return;
         }
 
-        require_once BASE_PATH . '/app/views/auth/reset-password.php';
+        require_once BASE_PATH . '/app/views/auth/reset_password.php';
     }
 
+    /**
+     * Processa a redefinição da senha.
+     */
     public function resetPassword()
     {
         $token = $_POST['token'];
@@ -155,59 +158,62 @@ class AuthController
         $reset_data = User::findResetToken($token);
 
         if (!$reset_data || strtotime($reset_data['expires_at']) < time()) {
-            die("Token inválido ou expirado.");
+            $error = "Token inválido ou expirado.";
+            require_once BASE_PATH . '/app/views/error.php';
+            return;
         }
 
-        if ($password !== $password_confirm) {
-            $error = "As senhas não coincidem.";
+        if (empty($password) || $password !== $password_confirm) {
+            $error = "As senhas não coincidem ou estão em branco.";
             require_once BASE_PATH . '/app/views/auth/reset-password.php';
             return;
         }
 
-        // Atualiza a senha do usuário
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         User::updatePassword($reset_data['email'], $password_hash);
-
-        // Deleta o token para que não possa ser usado novamente
         User::deleteResetToken($token);
 
-        // Redireciona para o login com uma mensagem de sucesso
         header('Location: ' . BASE_URL . '/login?status=password_updated');
         exit;
     }
 
+    /**
+     * Função auxiliar para enviar o e-mail.
+     */
     private function sendPasswordResetEmail($email, $token)
     {
         $mail = new PHPMailer(true);
         $reset_link = "http://localhost" . BASE_URL . "/reset-password?token=" . $token;
 
         try {
-            // Configurações do servidor de e-mail (SMTP)
-            // IMPORTANTE: Use um serviço de e-mail real como Gmail, SendGrid, etc.
-            // O exemplo abaixo usa as configurações do Mailtrap.io para teste.
+            // >>>>> DEPURAÇÃO REMOVIDA <<<<<
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; 
+
+            // --- CONFIGURAÇÃO CORRIGIDA DO GMAIL ---
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com'; // Servidor SMTP
+            $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'jpcslengman@gmail.com'; // Seu usuário
-            $mail->Password = 'akrd habr qbdl oqvc'; // Sua senha
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 456;
+            $mail->Username = 'jpcslengman@gmail.com'; // Seu e-mail do Gmail
+            $mail->Password = 'akrd habr qbdl oqvc';   // Sua senha de app de 16 letras
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Usar SMTPS (SSL)
+            $mail->Port = 465;                         // Porta correta para SMTPS
             $mail->CharSet = 'UTF-8';
 
             // Remetente e Destinatário
-            $mail->setFrom('no-reply@colae.com', 'Colaê Sistema');
+            $mail->setFrom('jpcslengman@gmail.com', 'Colaê Sistema');
             $mail->addAddress($email);
 
             // Conteúdo do E-mail
             $mail->isHTML(true);
             $mail->Subject = 'Recuperacao de Senha - Colaê';
-            $mail->Body    = "Olá!<br><br>Você solicitou a redefinição de sua senha. Clique no link abaixo para criar uma nova senha:<br><a href='{$reset_link}'>{$reset_link}</a><br><br>Se você não solicitou isso, pode ignorar este e-mail.<br><br>Atenciosamente,<br>Equipe Colaê";
+            $mail->Body    = "Olá!<br><br>Você solicitou a redefinição de sua senha. Clique no link abaixo para criar uma nova senha:<br><a href='{$reset_link}'>{$reset_link}</a><br><br>Este link expira em 1 hora.<br><br>Se você não solicitou isso, pode ignorar este e-mail.<br><br>Atenciosamente,<br>Equipe Colaê";
             $mail->AltBody = "Para redefinir sua senha, copie e cole este link no seu navegador: {$reset_link}";
 
             $mail->send();
         } catch (Exception $e) {
-            // Em um ambiente de produção, você deveria logar este erro
-            // echo "A mensagem não pôde ser enviada. Mailer Error: {$mail->ErrorInfo}";
+            // Com a depuração ativa, o erro detalhado já aparecerá na tela.
+            // Esta linha pode ser útil para logar o erro num ficheiro.
+            error_log("A mensagem não pôde ser enviada. Mailer Error: {$mail->ErrorInfo}");
         }
     }
 }

@@ -46,6 +46,7 @@
             <div>
                 <a href="<?php echo BASE_URL; ?>/dashboard">Meu Painel</a>
                 <!-- Adicione outros links aqui, como "Minhas Reservas", etc. -->
+                 <a href="http://localhost/colae/quadras">Quadras</a>
             </div>
             <div>
                 <a href="<?php echo BASE_URL; ?>/logout">Sair</a>

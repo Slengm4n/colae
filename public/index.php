@@ -15,6 +15,7 @@ require_once BASE_PATH . '/app/controllers/UserController.php';
 require_once BASE_PATH . '/app/controllers/SportController.php';
 require_once BASE_PATH . '/app/controllers/AdminController.php';
 require_once BASE_PATH . '/app/controllers/AuthController.php';
+require_once BASE_PATH . '/app/controllers/VenueController.php';
 
 $router = new Router();
 
@@ -58,7 +59,13 @@ $router->get('/esportes/editar/{id}', [SportController::class, 'edit']);
 $router->post('/esportes/atualizar', [SportController::class, 'update']);
 $router->get('/esportes/excluir/{id}', [SportController::class, 'delete']);
 
-
+//Rotas para quadras/locais
+$router->get('/quadras', [VenueController::class,'index']);
+$router->get('/quadras/criar', [VenueController::class,'create']);
+$router->post('/quadras/salvar', [VenueController::class,'store']);
+$router->get('/quadras/editar/{id}', [VenueController::class,'edit']);
+$router->post('/quadras/atualizar', [VenueController::class,'update']);
+$router->get('/quadras/excluir', [VenueController::class,'delete']);
 
 // Executa o roteador
 $router->dispatch();
