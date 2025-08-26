@@ -42,6 +42,7 @@ $router->get('/dashboard', [UserController::class, 'dashboard']);
 
 // --- ROTAS DO PAINEL ADMIN ---
 $router->get('/admin', [AdminController::class, 'dashboard']);
+$router->get('/admin/mapa', [AdminController::class, 'showMap']);
 
 // Rotas para Usuários
 $router->get('/usuarios', [UserController::class, 'index']);
@@ -64,8 +65,8 @@ $router->get('/quadras', [VenueController::class,'index']);
 $router->get('/quadras/criar', [VenueController::class,'create']);
 $router->post('/quadras/salvar', [VenueController::class,'store']);
 $router->get('/quadras/editar/{id}', [VenueController::class,'edit']);
-$router->post('/quadras/atualizar', [VenueController::class,'update']);
-$router->get('/quadras/excluir', [VenueController::class,'delete']);
+$router->post('/quadras/atualizar/{id}', [VenueController::class,'update']);
+$router->get('/quadras/excluir/{id}', [VenueController::class,'delete']);
 
 // Executa o roteador
 $router->dispatch();

@@ -26,4 +26,15 @@ class AdminController
             echo "Erro ao carregar o dashboard: " . $e->getMessage();
         }
     }
+
+    public function showMap()
+{
+    AuthHelper::check(); // Ou verifique se é um admin
+    
+    // Busca todas as quadras com coordenadas
+    $venuesWithCoords = Venue::getAllWithCoordinates();
+    
+    // Carrega a view do mapa e passa os dados para ela
+    require BASE_PATH . '/app/views/admin/map.php';
+}
 }
