@@ -72,10 +72,16 @@ class AuthController
                 return;
             }
 
+            if (!$this->isOver18($birthdate)) {
+                $error = "Você deve ter pelo menos 18 anos para se registrar.";
+                require_once BASE_PATH . '/app/views/auth/register.php';
+                return;
+            }
+
             if (User::findByEmail($email)) {
-                 $error = "Este e-mail já está cadastrado.";
-                 require_once BASE_PATH . '/app/views/auth/register.php';
-                 return;
+                $error = "Este e-mail já está cadastrado.";
+                require_once BASE_PATH . '/app/views/auth/register.php';
+                return;
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -89,7 +95,7 @@ class AuthController
             }
         }
     }
-    
+
     /**
      * Efetua o logout do usuário.
      */
@@ -214,6 +220,21 @@ class AuthController
             // Com a depuração ativa, o erro detalhado já aparecerá na tela.
             // Esta linha pode ser útil para logar o erro num ficheiro.
             error_log("A mensagem não pôde ser enviada. Mailer Error: {$mail->ErrorInfo}");
+        }
+    }
+
+    private function isOver18($birthdate)
+    {
+        if (empty($birthdate)) {
+            return false;
+        }
+        try {
+            $nascimento = new DateTime($birthdate);
+            $hoje = new DateTime();
+            $idade = $hoje->diff($nascimento);
+            return $idade->y >= 18;
+        } catch (Exception $e) {
+            return false;
         }
     }
 }
