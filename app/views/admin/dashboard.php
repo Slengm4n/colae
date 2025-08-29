@@ -63,8 +63,8 @@
     <div class="dashboard-container">
         <nav>
             <a href="http://localhost/colae/admin">Dashboard</a>
-            <a href="http://localhost/colae/usuarios">Gerenciar Usuários</a>
-            <a href="http://localhost/colae/esportes">Gerenciar Esportes</a>
+            <a href="http://localhost/colae/admin/usuarios">Gerenciar Usuários</a>
+            <a href="http://localhost/colae/admin/esportes">Gerenciar Esportes</a>
             <a href="http://localhost/colae/admin/mapa">Mapa de quadras Cadastradas</a>
             <a href="http://localhost/colae/logout" class="logout">Sair</a>
         </nav>

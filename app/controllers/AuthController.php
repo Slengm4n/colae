@@ -197,16 +197,16 @@ class AuthController
 
             // --- CONFIGURAÇÃO CORRIGIDA DO GMAIL ---
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->Host = MAIL_HOST;
             $mail->SMTPAuth = true;
-            $mail->Username = 'jpcslengman@gmail.com'; // Seu e-mail do Gmail
-            $mail->Password = 'akrd habr qbdl oqvc';   // Sua senha de app de 16 letras
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Usar SMTPS (SSL)
-            $mail->Port = 465;                         // Porta correta para SMTPS
+            $mail->Username = MAIL_USERNAME;
+            $mail->Password = MAIL_PASSWORD;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = MAIL_PORT;
             $mail->CharSet = 'UTF-8';
 
             // Remetente e Destinatário
-            $mail->setFrom('jpcslengman@gmail.com', 'Colaê Sistema');
+            $mail->setFrom(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
             $mail->addAddress($email);
 
             // Conteúdo do E-mail

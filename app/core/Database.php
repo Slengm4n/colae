@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../../config.php'; 
+
 class Database
 {
     private static $pdo;
@@ -13,7 +15,7 @@ class Database
             $pass = ''; // ou sua senha
 
             try {
-                self::$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+                self::$pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8", DB_USER, DB_PASS);
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ); // Retorna objetos por padrão
             } catch (PDOException $e) {

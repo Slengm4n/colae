@@ -43,8 +43,11 @@
 
     <!-- Carrega a API do Google Maps, chamando a nossa função initMap quando estiver pronta -->
     <!-- Lembre-se de substituir SUA_CHAVE_DE_API_VAI_AQUI pela sua chave -->
-    <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQWIOMMnTnuoKmr9Qkvkfkaif45pzTSoE&callback=initMap">
+      <?php 
+         require_once BASE_PATH . '/config.php'; 
+    ?>
+
+    <script async src="https://maps.googleapis.com/maps/api/js?key=<?php echo GOOGLE_MAPS_API_KEY; ?>&callback=initMap">
     </script>
 </body>
 </html>

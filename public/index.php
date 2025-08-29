@@ -9,6 +9,8 @@ define('BASE_PATH', dirname(__DIR__));
 
 define('BASE_URL', '/colae');
 
+require_once BASE_PATH . '/config.php';
+
 // Usa o BASE_PATH para incluir os ficheiros corretamente
 require_once BASE_PATH . '/app/core/Router.php';
 require_once BASE_PATH . '/app/controllers/UserController.php';
@@ -45,20 +47,20 @@ $router->get('/admin', [AdminController::class, 'dashboard']);
 $router->get('/admin/mapa', [AdminController::class, 'showMap']);
 
 // Rotas para Usuários
-$router->get('/usuarios', [UserController::class, 'index']);
-$router->get('/usuarios/criar', [UserController::class, 'create']);
-$router->post('/usuarios/salvar', [UserController::class, 'store']);
-$router->get('/usuarios/editar/{id}', [UserController::class, 'edit']);
-$router->post('/usuarios/atualizar', [UserController::class, 'update']);
-$router->get('/usuarios/excluir/{id}', [UserController::class, 'delete']);
+$router->get('/admin/usuarios', [UserController::class, 'index']);
+$router->get('/admin/usuarios/criar', [UserController::class, 'create']);
+$router->post('/admin/usuarios/salvar', [UserController::class, 'store']);
+$router->get('/admin/usuarios/editar/{id}', [UserController::class, 'edit']);
+$router->post('/admin/usuarios/atualizar', [UserController::class, 'update']);
+$router->get('/admin/usuarios/excluir/{id}', [UserController::class, 'delete']);
 
 // Rotas para esportes
-$router->get('/esportes', [SportController::class, 'index']);
-$router->get('/esportes/criar', [SportController::class, 'create']);
-$router->post('/esportes/salvar', [SportController::class, 'store']);
-$router->get('/esportes/editar/{id}', [SportController::class, 'edit']);
-$router->post('/esportes/atualizar', [SportController::class, 'update']);
-$router->get('/esportes/excluir/{id}', [SportController::class, 'delete']);
+$router->get('/admin/esportes', [SportController::class, 'index']);
+$router->get('/admin/esportes/criar', [SportController::class, 'create']);
+$router->post('/admin/esportes/salvar', [SportController::class, 'store']);
+$router->get('/admin/esportes/editar/{id}', [SportController::class, 'edit']);
+$router->post('/admin/esportes/atualizar', [SportController::class, 'update']);
+$router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete']);
 
 //Rotas para quadras/locais
 $router->get('/quadras', [VenueController::class,'index']);
