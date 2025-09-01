@@ -6,9 +6,16 @@ require_once __DIR__ . '/../core/AuthHelper.php';
 class VenueController
 {
 
-    /**
-     * Display a list of all available venues.
-     */
+    private function checkCpfStatus()
+    {
+        AuthHelper::check();
+        if (empty($_SESSION['user_cpf'])) {
+            // Se não tiver CPF, redireciona para o dashboard com uma mensagem
+            header('Location: ' . BASE_URL . '/dashboard?error=cpf_required');
+            exit;
+        }
+    }
+
     public function index()
     {
         AuthHelper::check();
@@ -23,6 +30,7 @@ class VenueController
     public function create()
     {
         AuthHelper::check();
+        $this->checkCpfStatus();
         require BASE_PATH . '/app/views/venues/create.php';
     }
 
@@ -32,8 +40,9 @@ class VenueController
     public function store()
     {
         AuthHelper::check();
+        $this->checkCpfStatus();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
+
             // Passo 1: Obter o ID do usuário logado
             $userId = $_SESSION['user_id'];
 
@@ -66,7 +75,7 @@ class VenueController
                 header('Location: ' . BASE_URL . '/quadras');
                 exit;
             } else {
-                // Lidar com erro potencial (ex: falha na criação do endereço)
+                Logger::getInstance()->error('Erro ao criar quadra ou endereço', ['user_id' => $userId]);
                 echo "Erro ao criar quadra ou endereço.";
             }
         }
@@ -79,7 +88,7 @@ class VenueController
     public function edit($id)
     {
         AuthHelper::check();
-        
+
         // Fetch the combined venue and address data to pre-fill the form
         $venue = Venue::readOne($id);
 
@@ -98,39 +107,39 @@ class VenueController
      * @param int $id The ID of the venue to update.
      */
     public function update($id)
-{
-    var_dump($_POST);
-    die();
-    
-    AuthHelper::check();
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    {
+        var_dump($_POST);
+        die();
 
-        // Passo 1: Atualizar a tabela de Endereços
-        $address = new Address();
-        $address->id = $_POST['address_id']; // Vem do campo oculto do formulário
-        $address->cep = htmlspecialchars($_POST['cep']);
-        $address->street = htmlspecialchars($_POST['street']);
-        $address->number = htmlspecialchars($_POST['number']);
-        $address->neighborhood = htmlspecialchars($_POST['neighborhood']);
-        $address->complement = htmlspecialchars($_POST['complement']);
-        $address->city = htmlspecialchars($_POST['city']);
-        $address->state = htmlspecialchars($_POST['state']);
-        $addressUpdated = $address->update(); // Chama o método de atualização do Address
+        AuthHelper::check();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        // Passo 2: Atualizar a tabela de Quadras (Venue)
-        $venue = new Venue();
-        $venue->id = $id;
-        // ... (resto dos campos da quadra) ...
-        $venueUpdated = $venue->update();
+            // Passo 1: Atualizar a tabela de Endereços
+            $address = new Address();
+            $address->id = $_POST['address_id']; // Vem do campo oculto do formulário
+            $address->cep = htmlspecialchars($_POST['cep']);
+            $address->street = htmlspecialchars($_POST['street']);
+            $address->number = htmlspecialchars($_POST['number']);
+            $address->neighborhood = htmlspecialchars($_POST['neighborhood']);
+            $address->complement = htmlspecialchars($_POST['complement']);
+            $address->city = htmlspecialchars($_POST['city']);
+            $address->state = htmlspecialchars($_POST['state']);
+            $addressUpdated = $address->update(); // Chama o método de atualização do Address
 
-        if ($venueUpdated && $addressUpdated) {
-            header('Location: ' . BASE_URL . '/quadras');
-            exit;
-        } else {
-            echo "Erro ao atualizar a quadra ou o endereço.";
+            // Passo 2: Atualizar a tabela de Quadras (Venue)
+            $venue = new Venue();
+            $venue->id = $id;
+            // ... (resto dos campos da quadra) ...
+            $venueUpdated = $venue->update();
+
+            if ($venueUpdated && $addressUpdated) {
+                header('Location: ' . BASE_URL . '/quadras');
+                exit;
+            } else {
+                echo "Erro ao atualizar a quadra ou o endereço.";
+            }
         }
     }
-}
 
     /**
      * "Soft delete" the specified venue.

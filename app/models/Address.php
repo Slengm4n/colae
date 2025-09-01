@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../../config.php';
 
 class Address
 {
@@ -14,48 +15,48 @@ class Address
     public $state;
 
     public static function create($cep, $street, $number, $neighborhood, $complement, $city, $state)
-{
-    // --- Início da Lógica de Geocodificação ---
-    $apiKey = 'GOOGLE_MAPS_API_KEY';
-    $fullAddress = urlencode("$street, $number, $neighborhood, $city, $state, $cep");
-    $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$fullAddress}&key={$apiKey}";
+    {
+        // --- Início da Lógica de Geocodificação ---
+        $apiKey = 'GOOGLE_MAPS_API_KEY';
+        $fullAddress = urlencode("$street, $number, $neighborhood, $city, $state, $cep");
+        $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$fullAddress}&key={$apiKey}";
 
-    $latitude = null;
-    $longitude = null;
+        $latitude = null;
+        $longitude = null;
 
-    // @ suprime erros caso a URL falhe; verificamos o resultado a seguir
-    $responseJson = @file_get_contents($url);
-    if ($responseJson) {
-        $response = json_decode($responseJson);
-        if ($response && $response->status == 'OK') {
-            $location = $response->results[0]->geometry->location;
-            $latitude = $location->lat;
-            $longitude = $location->lng;
+        // @ suprime erros caso a URL falhe; verificamos o resultado a seguir
+        $responseJson = @file_get_contents($url);
+        if ($responseJson) {
+            $response = json_decode($responseJson);
+            if ($response && $response->status == 'OK') {
+                $location = $response->results[0]->geometry->location;
+                $latitude = $location->lat;
+                $longitude = $location->lng;
+            }
         }
-    }
-    // --- Fim da Lógica de Geocodificação ---
+        // --- Fim da Lógica de Geocodificação ---
 
-    $pdo = Database::getConnection();
-    
-    // Adicionamos latitude e longitude à query de inserção
-    $query = "INSERT INTO addresses (cep, street, number, neighborhood, complement, city, state, latitude, longitude) 
+        $pdo = Database::getConnection();
+
+        // Adicionamos latitude e longitude à query de inserção
+        $query = "INSERT INTO addresses (cep, street, number, neighborhood, complement, city, state, latitude, longitude) 
               VALUES (:cep, :street, :number, :neighborhood, :complement, :city, :state, :latitude, :longitude)";
-    
-    $stmt = $pdo->prepare($query);
 
-    $stmt->bindParam(":cep", $cep);
-    $stmt->bindParam(":street", $street);
-    $stmt->bindParam(":number", $number);
-    $stmt->bindParam(":neighborhood", $neighborhood);
-    $stmt->bindParam(":complement", $complement);
-    $stmt->bindParam(":city", $city);
-    $stmt->bindParam(":state", $state);
-    $stmt->bindParam(":latitude", $latitude);
-    $stmt->bindParam(":longitude", $longitude);
+        $stmt = $pdo->prepare($query);
 
-    $stmt->execute();
-    return $pdo->lastInsertId();
-}
+        $stmt->bindParam(":cep", $cep);
+        $stmt->bindParam(":street", $street);
+        $stmt->bindParam(":number", $number);
+        $stmt->bindParam(":neighborhood", $neighborhood);
+        $stmt->bindParam(":complement", $complement);
+        $stmt->bindParam(":city", $city);
+        $stmt->bindParam(":state", $state);
+        $stmt->bindParam(":latitude", $latitude);
+        $stmt->bindParam(":longitude", $longitude);
+
+        $stmt->execute();
+        return $pdo->lastInsertId();
+    }
 
     public static function readOne($id)
     {
@@ -84,7 +85,7 @@ class Address
                     city = :city, 
                     state = :state
                   WHERE id = :id";
-                  
+
         $stmt = $pdo->prepare($query);
 
         // Sintaxe do bindParam corrigida

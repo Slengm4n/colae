@@ -13,6 +13,7 @@
     # Se o ficheiro ou diretório solicitado não existir fisicamente...
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+
     # ...redireciona o pedido para o index.php dentro da pasta public.
     RewriteRule . public/index.php [L]
 </IfModule>

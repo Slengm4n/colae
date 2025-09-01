@@ -22,32 +22,37 @@ class Router
     public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'];
-
-        // Lê a URI corretamente, sem depender de $_GET['url']
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        // Remove a pasta base do projeto da URI
-        $basePath = '/colae';
-        if (strpos($uri, $basePath) === 0) {
-            $uri = substr($uri, strlen($basePath));
+        $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // Remove a pasta base (BASE_URL) da URI da requisição
+        $uri = '/'; // Valor padrão para a raiz
+        if (strpos($requestUri, BASE_URL) === 0) {
+            $uri = substr($requestUri, strlen(BASE_URL));
         }
 
+        // Garante que a URI comece com uma barra e não termine com uma (a menos que seja a raiz)
+        if (empty($uri) || $uri[0] !== '/') {
+            $uri = '/' . $uri;
+        }
         if (strlen($uri) > 1) {
             $uri = rtrim($uri, '/');
         }
 
-        if (empty($uri)) {
-            $uri = '/';
-        }
+        // Descomente as linhas abaixo para depurar e ver exatamente qual URI o roteador está a tentar encontrar
+        // echo "Método: " . $method . "<br>";
+        // echo "URI Processada: " . $uri;
+        // echo "<pre>";
+        // print_r($this->routes[$method]);
+        // echo "</pre>";
+        // die();
 
-
+        // Procura uma correspondência exata primeiro
         if (isset($this->routes[$method][$uri])) {
             $this->executeHandler($this->routes[$method][$uri]);
             return;
         }
 
-
-        // Lógica para encontrar a rota, incluindo parâmetros dinâmicos
+        // Se não encontrou, procura por rotas com parâmetros dinâmicos (ex: /editar/{id})
         foreach ($this->routes[$method] as $routePath => $handler) {
             if (strpos($routePath, '{') !== false) {
                 $pattern = preg_replace('/\\{([a-zA-Z0-9_]+)\\}/', '(?P<$1>[^/]+)', $routePath);
@@ -61,6 +66,7 @@ class Router
             }
         }
 
+        // Se nada correspondeu, envia o 404
         $this->sendNotFound();
     }
 
@@ -74,16 +80,16 @@ class Router
             if (method_exists($controller, $methodName)) {
                 call_user_func_array([$controller, $methodName], $params);
             } else {
-                $this->sendNotFound();
+                $this->sendNotFound("Método '{$methodName}' não encontrado no controller '{$handler[0]}'.");
             }
         } else {
-            $this->sendNotFound();
+            $this->sendNotFound("Handler da rota não é válido.");
         }
     }
 
-    private function sendNotFound()
+    private function sendNotFound($message = "Página não encontrada pelo Roteador")
     {
         http_response_code(404);
-        echo "<h1>404 - Página não encontrada pelo Roteador</h1>";
+        echo "<h1>404 - {$message}</h1>";
     }
 }

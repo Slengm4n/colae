@@ -4,65 +4,45 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Define o caminho base como o diretório *acima* do atual (ou seja, a raiz 'colae/')
+// --- Constantes e Configurações Globais ---
 define('BASE_PATH', dirname(__DIR__));
-
 define('BASE_URL', '/colae');
-
 require_once BASE_PATH . '/config.php';
 
-// Usa o BASE_PATH para incluir os ficheiros corretamente
+// --- Inclusão dos Controllers ---
 require_once BASE_PATH . '/app/core/Router.php';
+require_once BASE_PATH . '/app/controllers/HomeController.php';
+require_once BASE_PATH . '/app/controllers/AuthController.php';
 require_once BASE_PATH . '/app/controllers/UserController.php';
+require_once BASE_PATH . '/app/controllers/VenueController.php';
 require_once BASE_PATH . '/app/controllers/SportController.php';
 require_once BASE_PATH . '/app/controllers/AdminController.php';
-require_once BASE_PATH . '/app/controllers/AuthController.php';
-require_once BASE_PATH . '/app/controllers/VenueController.php';
+
 
 $router = new Router();
 
-// Página Inicial
-$router->get('/', function () {
-    require_once BASE_PATH . '/app/views/home/index.php';
-});
+// --- ROTA PRINCIPAL ---
+$router->get('/', [HomeController::class, 'index']);
 
-//Rotas de autenticação e registro
+// --- ROTAS DE AUTENTICAÇÃO ---
 $router->get('/login', [AuthController::class, 'index']);
 $router->post('/login/authenticate', [AuthController::class, 'authenticate']);
 $router->get('/register', [AuthController::class, 'register']);
 $router->post('/register/store', [AuthController::class, 'store']);
 $router->get('/logout', [AuthController::class, 'logout']);
-
-// --- ROTAS DE RECUPERAÇÃO DE SENHA ---
 $router->get('/forgot-password', [AuthController::class, 'showForgotPasswordForm']);
 $router->post('/forgot-password', [AuthController::class, 'sendResetLink']);
 $router->get('/reset-password', [AuthController::class, 'showResetPasswordForm']);
 $router->post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// --- ROTAS DO USUÁRIO ---
+
+// --- ROTAS DO PAINEL DO USUÁRIO ---
 $router->get('/dashboard', [UserController::class, 'dashboard']);
+$router->get('/dashboard/cpf', [UserController::class, 'addCpf']);
+$router->post('/dashboard/cpf', [UserController::class, 'storeCpf']);
 
-// --- ROTAS DO PAINEL ADMIN ---
-$router->get('/admin', [AdminController::class, 'dashboard']);
-$router->get('/admin/mapa', [AdminController::class, 'showMap']);
 
-// Rotas para Usuários
-$router->get('/admin/usuarios', [UserController::class, 'index']);
-$router->get('/admin/usuarios/criar', [UserController::class, 'create']);
-$router->post('/admin/usuarios/salvar', [UserController::class, 'store']);
-$router->get('/admin/usuarios/editar/{id}', [UserController::class, 'edit']);
-$router->post('/admin/usuarios/atualizar', [UserController::class, 'update']);
-$router->get('/admin/usuarios/excluir/{id}', [UserController::class, 'delete']);
-
-// Rotas para esportes
-$router->get('/admin/esportes', [SportController::class, 'index']);
-$router->get('/admin/esportes/criar', [SportController::class, 'create']);
-$router->post('/admin/esportes/salvar', [SportController::class, 'store']);
-$router->get('/admin/esportes/editar/{id}', [SportController::class, 'edit']);
-$router->post('/admin/esportes/atualizar', [SportController::class, 'update']);
-$router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete']);
-
-//Rotas para quadras/locais
+// --- ROTAS DE QUADRAS (VENUES) ---
 $router->get('/quadras', [VenueController::class,'index']);
 $router->get('/quadras/criar', [VenueController::class,'create']);
 $router->post('/quadras/salvar', [VenueController::class,'store']);
@@ -70,5 +50,26 @@ $router->get('/quadras/editar/{id}', [VenueController::class,'edit']);
 $router->post('/quadras/atualizar/{id}', [VenueController::class,'update']);
 $router->get('/quadras/excluir/{id}', [VenueController::class,'delete']);
 
+
+// --- ROTAS DO PAINEL ADMIN ---
+$router->get('/admin', [AdminController::class, 'dashboard']);
+$router->get('/admin/mapa', [AdminController::class, 'showMap']);
+// Usuários (Admin)
+$router->get('/admin/usuarios', [UserController::class, 'index']);
+$router->get('/admin/usuarios/criar', [UserController::class, 'create']);
+$router->post('/admin/usuarios/salvar', [UserController::class, 'store']);
+$router->get('/admin/usuarios/editar/{id}', [UserController::class, 'edit']);
+$router->post('/admin/usuarios/atualizar', [UserController::class, 'update']);
+$router->get('/admin/usuarios/excluir/{id}', [UserController::class, 'delete']);
+// Esportes (Admin)
+$router->get('/admin/esportes', [SportController::class, 'index']);
+$router->get('/admin/esportes/criar', [SportController::class, 'create']);
+$router->post('/admin/esportes/salvar', [SportController::class, 'store']);
+$router->get('/admin/esportes/editar/{id}', [SportController::class, 'edit']);
+$router->post('/admin/esportes/atualizar', [SportController::class, 'update']);
+$router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete']);
+
+
 // Executa o roteador
 $router->dispatch();
+

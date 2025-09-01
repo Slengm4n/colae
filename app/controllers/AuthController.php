@@ -4,6 +4,7 @@ require_once BASE_PATH . '/vendor/autoload.php';
 
 require_once BASE_PATH . '/app/models/User.php';
 require_once BASE_PATH . '/app/core/AuthHelper.php';
+require_once BASE_PATH . '/app/core/Logger.php';
 
 // Usa as classes do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
@@ -42,6 +43,8 @@ class AuthController
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
 
+                Logger::getInstance()->info('Usuário logado com sucesso', ['user_id' => $user['id'], 'email' => $user['email']]);
+
                 if ($user['role'] === 'admin') {
                     header('Location: ' . BASE_URL . '/admin');
                 } else {
@@ -49,6 +52,8 @@ class AuthController
                 }
                 exit;
             } else {
+
+                Logger::getInstance()->warning('Falha na tentativa de login', ['user_id' => $user['id'], 'email' => $user['email']]);
                 $error = "Email ou senha inválidos.";
                 require_once BASE_PATH . '/app/views/auth/login.php';
             }
@@ -102,6 +107,9 @@ class AuthController
     public function logout()
     {
         AuthHelper::start();
+
+        Logger::getInstance()->info('Usuário deslogado', ['user_id' => $_SESSION['user_id'] ?? 'N/A']);
+
         session_unset();
         session_destroy();
         header('Location: ' . BASE_URL . '/login');
@@ -126,7 +134,12 @@ class AuthController
                 $token = bin2hex(random_bytes(32));
                 $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
                 User::savePasswordResetToken($email, $token, $expires_at);
+
+                Logger::getInstance()->info('Solicitação de redefinição de senha para usuário', ['user_id' => $user['id'], 'email' => $user['email']]);
+
                 $this->sendPasswordResetEmail($email, $token);
+            } else {
+                Logger::getInstance()->warning('Tentativa de redefinição de senha para e-mail não cadastrado', ['email' => $email, 'ip' => $_SERVER['REMOTE_ADDR']]);
             }
 
             $message = "Se uma conta com este e-mail existir, um link de recuperação foi enviado.";
@@ -216,10 +229,15 @@ class AuthController
             $mail->AltBody = "Para redefinir sua senha, copie e cole este link no seu navegador: {$reset_link}";
 
             $mail->send();
+
+            Logger::getInstance()->info('E-mail de redefinição de senha enviado', ['email' => $email]);
         } catch (Exception $e) {
             // Com a depuração ativa, o erro detalhado já aparecerá na tela.
             // Esta linha pode ser útil para logar o erro num ficheiro.
-            error_log("A mensagem não pôde ser enviada. Mailer Error: {$mail->ErrorInfo}");
+            Logger::getInstance()->error(
+                'Falha ao enviar e-mail de redefinição de senha',
+                ['email' => $email, 'error_message' => $mail->ErrorInfo]
+            );
         }
     }
 

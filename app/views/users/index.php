@@ -29,8 +29,8 @@
                     <td><?php echo htmlspecialchars($row['status']); ?></td>
                     <td><?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?></td>
                     <td>
-                        <a href="http://localhost/colae/usuarios/editar/<?php echo $row['id']; ?>" class="btn btn-warning">Editar</a>
-                        <a href="http://localhost/colae/usuarios/excluir/<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Tem certeza?')">Excluir</a>
+                        <a href="http://localhost/colae/admin/usuarios/editar/<?php echo $row['id']; ?>" class="btn btn-warning">Editar</a>
+                        <a href="http://localhost/colae/admin/usuarios/excluir/<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Tem certeza?')">Excluir</a>
                     </td>
                 </tr>
             <?php
