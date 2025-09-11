@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    # Ativa o motor de reescrita
+    RewriteEngine On
+
+    # Define a pasta base do projeto
+    RewriteBase /colae/
+
+    # REGRA 1: Lida com a página principal (com ou sem barra final).
+    # O "?" torna a barra opcional, corrigindo o erro 404 na raiz.
+    RewriteRule ^/?$ public/index.php [L]
+
+    # REGRA 2: Lida com todos os outros pedidos.
+    # Se o ficheiro ou diretório solicitado não existir fisicamente...
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # ...redireciona o pedido para o index.php dentro da pasta public.
+    RewriteRule . public/index.php [L]
+</IfModule>
