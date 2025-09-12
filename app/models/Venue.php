@@ -50,7 +50,10 @@ class Venue
         $stmt->bindParam(':is_covered', $isCovered);
         $stmt->bindParam(':status', $status);
         
-        return $stmt->execute();
+        if ($stmt->execute()){
+            return $pdo->lastInsertId();
+        }
+        return false;
     }
 
     public static function readOne($id)
@@ -71,11 +74,23 @@ class Venue
     public static function getAllWithCoordinates()
 {
     $pdo = Database::getConnection();
-    // Seleciona apenas quadras que têm coordenadas válidas
-    $query = "SELECT v.name, a.latitude, a.longitude
+
+    $query = "SELECT 
+                v.id, 
+                v.name, 
+                a.street, 
+                a.number, 
+                a.city, 
+                a.latitude, 
+                a.longitude,
+                vi.file_path AS image_path -- <== CAMPO DA IMAGEM ADICIONADO
               FROM venues v
               JOIN addresses a ON v.address_id = a.id
-              WHERE a.latitude IS NOT NULL AND a.longitude IS NOT NULL";
+              -- Usamos LEFT JOIN para garantir que quadras sem imagem também apareçam
+              LEFT JOIN venue_images vi ON v.id = vi.venue_id
+              WHERE a.latitude IS NOT NULL AND a.longitude IS NOT NULL
+              GROUP BY v.id"; // Agrupamos para pegar apenas uma imagem por quadra
+
     $stmt = $pdo->prepare($query);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

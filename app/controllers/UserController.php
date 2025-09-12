@@ -5,16 +5,21 @@
     class UserController
     {
 
-        public function dashboard()
-        {
-            // Apenas usuários logados podem acessar esta página
-            AuthHelper::check();
-            $user = User::findById($_SESSION['user_id']);
-            $_SESSION['user_cpf'] = $user['cpf'];
-            // Carrega a view do painel do usuário
-            require_once BASE_PATH . '/app/views/users/dashboard.php';
-        }
+       public function dashboard()
+{
+    AuthHelper::check();
 
+    // A MUDANÇA ESTÁ AQUI:
+    // Só vamos ao banco de dados buscar o CPF se ele ainda não estiver na sessão.
+    // Isso impede que ele seja sobrescrito a cada recarregamento da página.
+    if (!isset($_SESSION['user_cpf']) || empty($_SESSION['user_cpf'])) {
+        $user = User::findById($_SESSION['user_id']);
+        $_SESSION['user_cpf'] = $user['cpf'];
+    }
+
+    // O resto do seu código pode continuar normal para carregar a view
+    require_once BASE_PATH . '/app/views/users/dashboard.php';
+} 
         public function index()
         {
             AuthHelper::check();
@@ -74,12 +79,10 @@
 
                 // Salva o CPF no banco de dados
                 if (User::updateCpf($userId, $cpf)) {
-                    Logger::getInstance()->info('CPF adicionado com sucesso.', ['user_id' => $userId]);
                     $_SESSION['user_cpf'] = $cpf; // Atualiza a sessão
                     header('Location: ' . BASE_URL . '/dashboard?status=cpf_success');
                     exit;
                 } else {
-                    Logger::getInstance()->error('Erro ao salvar CPF no banco de dados.', ['user_id' => $userId]);
                     $error = "Ocorreu um erro ao salvar seu CPF. Tente novamente.";
                     require_once BASE_PATH . '/app/views/users/add_cpf.php';
                 }

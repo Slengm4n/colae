@@ -3,99 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <style>
-        /* Estilo para a página de login */
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-            padding: 20px 0;
-        }
-
-        .login-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.5rem;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.7rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 1rem;
-        }
-    </style>
+    <title>Login - Kolaê</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="login-container">
-        <h1>Acessar Sistema</h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Acessar Sistema</h1>
+            <p class="text-gray-500">Faça login para continuar</p>
+        </div>
 
         <?php if (isset($error)): ?>
-            <p class="error"><?php echo htmlspecialchars($error); ?></p>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 text-center" role="alert">
+                <span><?php echo htmlspecialchars($error); ?></span>
+            </div>
         <?php endif; ?>
 
-        <!-- CORREÇÃO AQUI: Usando a constante BASE_URL para o action do formulário -->
         <form action="<?php echo BASE_URL; ?>/login/authenticate" method="POST">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+            
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">E-mail:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                    required>
             </div>
-            <div class="form-group">
-                <label for="password">Senha:</label>
-                <input type="password" id="password" name="password" required>
+            
+            <div class="mb-4">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Senha:</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                    required>
             </div>
-            <button type="submit">Entrar</button>
+
+            <div class="text-right text-sm mb-6">
+                <a href="<?php echo BASE_URL; ?>/forgot-password" class="text-blue-500 hover:underline">
+                    Esqueci minha senha
+                </a>
+            </div>
+            
+            <button 
+                type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-300"
+            >
+                Entrar
+            </button>
         </form>
 
-        <div class="register-link">
-            <p>Não tem uma conta? <a href="<?php echo BASE_URL; ?>/register">Crie uma aqui</a></p>
-        </div>
-        <!-- Dentro do seu .login-container -->
-        <div style="text-align: right; font-size: 0.9em; margin-top: -0.5rem; margin-bottom: 1rem;">
-            <a href="<?php echo BASE_URL; ?>/forgot-password">Esqueci minha senha</a>
+        <div class="text-center mt-6">
+            <p class="text-sm text-gray-600">
+                Não tem uma conta? 
+                <a href="<?php echo BASE_URL; ?>/register" class="text-blue-500 font-bold hover:underline">
+                    Crie uma aqui
+                </a>
+            </p>
         </div>
     </div>
 </body>

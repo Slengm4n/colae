@@ -1,10 +1,8 @@
 <?php
 // Inclui o autoload do Composer.
-require_once BASE_PATH . '/vendor/autoload.php';
 
 require_once BASE_PATH . '/app/models/User.php';
 require_once BASE_PATH . '/app/core/AuthHelper.php';
-require_once BASE_PATH . '/app/core/Logger.php';
 
 // Usa as classes do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
@@ -43,8 +41,6 @@ class AuthController
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
 
-                Logger::getInstance()->info('Usuário logado com sucesso', ['user_id' => $user['id'], 'email' => $user['email']]);
-
                 if ($user['role'] === 'admin') {
                     header('Location: ' . BASE_URL . '/admin');
                 } else {
@@ -53,7 +49,6 @@ class AuthController
                 exit;
             } else {
 
-                Logger::getInstance()->warning('Falha na tentativa de login', ['user_id' => $user['id'], 'email' => $user['email']]);
                 $error = "Email ou senha inválidos.";
                 require_once BASE_PATH . '/app/views/auth/login.php';
             }
@@ -105,11 +100,8 @@ class AuthController
      * Efetua o logout do usuário.
      */
     public function logout()
-    {
+{
         AuthHelper::start();
-
-        Logger::getInstance()->info('Usuário deslogado', ['user_id' => $_SESSION['user_id'] ?? 'N/A']);
-
         session_unset();
         session_destroy();
         header('Location: ' . BASE_URL . '/login');

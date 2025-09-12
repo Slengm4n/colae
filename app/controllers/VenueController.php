@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../models/Venue.php';
 require_once __DIR__ . '/../models/Address.php'; // <-- Include the new Address model
 require_once __DIR__ . '/../core/AuthHelper.php';
+require_once __DIR__ . '/../core/ImageHelper.php';
+require_once __DIR__ . '/../models/VenueImage.php';
 
 class VenueController
 {
@@ -41,43 +43,61 @@ class VenueController
     {
         AuthHelper::check();
         $this->checkCpfStatus();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-            // Passo 1: Obter o ID do usuário logado
-            $userId = $_SESSION['user_id'];
-
-            // Passo 2: Criar o registro de Endereço primeiro e obter seu novo ID
-            // Corrigido para passar todos os argumentos que o Address::create espera
+            // Passo 1: Salvar o endereço e obter o ID
             $addressId = Address::create(
-                $_POST['cep'],
-                $_POST['street'],
-                $_POST['number'],
-                $_POST['neighborhood'],
-                $_POST['complement'],
-                $_POST['city'],
-                $_POST['state']
+                $_POST['cep'], $_POST['street'], $_POST['number'], $_POST['neighborhood'],
+                $_POST['complement'] ?? null, $_POST['city'], $_POST['state']
             );
 
-            // Passo 3: Criar o registro de Quadra usando o novo ID do endereço
-            if ($addressId && Venue::create(
-                $userId,
-                $addressId,
-                $_POST['name'],
-                $_POST['average_price_per_hour'],
-                $_POST['court_capacity'],
-                $_POST['has_leisure_area'],
-                $_POST['leisure_area_capacity'],
-                $_POST['floor_type'],
-                $_POST['has_lighting'],
-                $_POST['is_covered']
-                // status tem um valor padrão, então não precisamos passar
-            )) {
-                header('Location: ' . BASE_URL . '/quadras');
-                exit;
-            } else {
-                Logger::getInstance()->error('Erro ao criar quadra ou endereço', ['user_id' => $userId]);
-                echo "Erro ao criar quadra ou endereço.";
+            if (!$addressId) {
+                // Adicionar tratamento de erro (ex: redirecionar com mensagem)
+                die("Erro fatal ao criar o endereço.");
             }
+
+            // Passo 2: Salvar a quadra e obter o ID (requer a alteração no Venue::create)
+            $venueId = Venue::create(
+                $_SESSION['user_id'], $addressId, $_POST['name'], $_POST['average_price_per_hour'],
+                $_POST['court_capacity'], $_POST['has_leisure_area'], $_POST['leisure_area_capacity'],
+                $_POST['floor_type'], $_POST['has_lighting'], $_POST['is_covered']
+            );
+            
+            if (!$venueId) {
+                // Adicionar tratamento de erro
+                die("Erro fatal ao criar a quadra.");
+            }
+
+            // --- Passo 3: PROCESSAR E SALVAR AS IMAGENS ---
+            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                $uploadDir = BASE_PATH . "/public/uploads/venues/" . $venueId . "/";
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $imageCount = count($_FILES['images']['name']);
+                for ($i = 0; $i < $imageCount; $i++) {
+                    if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                        $tmpName = $_FILES['images']['tmp_name'][$i];
+                        $originalName = $_FILES['images']['name'][$i];
+                        $fileExtension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+                        // Gera um nome de arquivo único
+                        $newFileName = uniqid('venue_', true) . '.' . $fileExtension;
+                        $destinationPath = $uploadDir . $newFileName;
+
+                        // Otimiza e move a imagem usando o Helper
+                        if (ImageHelper::optimize($tmpName, $destinationPath)) {
+                            // Salva a referência no banco de dados usando o Model
+                            VenueImage::create($venueId, $newFileName);
+                        }
+                    }
+                }
+            }
+
+            // Passo 4: Redirecionar para a lista de quadras com sucesso
+            header('Location: ' . BASE_URL . '/quadras');
+            exit;
         }
     }
 

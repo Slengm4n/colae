@@ -17,7 +17,7 @@ class Address
     public static function create($cep, $street, $number, $neighborhood, $complement, $city, $state)
     {
         // --- Início da Lógica de Geocodificação ---
-        $apiKey = 'GOOGLE_MAPS_API_KEY';
+        $apiKey = GOOGLE_MAPS_API_KEY;
         $fullAddress = urlencode("$street, $number, $neighborhood, $city, $state, $cep");
         $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$fullAddress}&key={$apiKey}";
 

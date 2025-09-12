@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../core/Database.php';
-require_once __DIR__ . '/../core/Logger.php';
 
 class User
 {
@@ -22,7 +21,7 @@ class User
             Logger::getInstance()->critical('Extensão OpenSSL não está habilitada. Não é possível criptografar o CPF.');
             return false;
         }
-        $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, ENCRYPTION_IV);
+        $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
 
         if ($encrypted === false) {
             Logger::getInstance()->critical('openssl_encrypt falhou. Verifique se ENCRYPTION_KEY e ENCRYPTION_IV estão corretas no config.php.');
@@ -38,14 +37,12 @@ class User
         }
 
         if (!extension_loaded('openssl')) {
-            Logger::getInstance()->critical('Extensão OpenSSL não está habilitada. Não é possível descriptografar o CPF.');
             return false; // Retorna false em caso de falha
         }
 
-        $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, ENCRYPTION_IV);
+        $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
 
-        if ($decrypted === false) {
-            Logger::getInstance()->critical('openssl_decrypt falhou. O dado pode estar corrompido ou a chave/IV estão incorretos.');
+        if ($decrypted === false){ 
             return false; // Retorna false em caso de falha
         }
         return $decrypted;
