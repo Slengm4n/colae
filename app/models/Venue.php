@@ -19,6 +19,22 @@ class Venue
     public $created_at;
     public $updated_at;
 
+    public static function findByUserId($userId)
+    {
+        $pdo = Database::getConnection();
+        $query = "SELECT v.*, a.street, a.number,
+                  -- Subquery para pegar apenas a primeira imagem de cada local
+                  (SELECT vi.file_path FROM venue_images vi WHERE vi.venue_id = v.id ORDER BY vi.id ASC LIMIT 1) as image_path
+                  FROM venues v
+                  JOIN addresses a ON v.address_id = a.id
+                  WHERE v.user_id = :user_id
+                  ORDER BY v.created_at DESC";
+                  
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     public static function getAll()
     {
         $pdo = Database::getConnection();

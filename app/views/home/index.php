@@ -100,7 +100,7 @@
             </video>
             <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-[-1]"></div>
             <div class="container mx-auto px-4 relative z-10">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold max-w-lg leading-tight mx-auto md:mx-0">Cola-se com quem ama esporte</h1>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold max-w-lg leading-tight mx-auto md:mx-0">Cole com quem ama esporte</h1>
                 <div class="flex flex-wrap gap-4 mt-8 justify-center md:justify-start">
                     <a href="http://localhost/colae/login" class="py-3 px-8 rounded-full font-semibold transition-all duration-300 bg-white text-black border-2 border-white hover:bg-transparent hover:text-white">Comece de graça</a>
                 </div>

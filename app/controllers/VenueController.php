@@ -105,61 +105,87 @@ class VenueController
      * Show the form for editing a specific venue.
      * @param int $id The ID of the venue to edit.
      */
-    public function edit($id)
-    {
-        AuthHelper::check();
+    
+public function edit($id)
+{
+    AuthHelper::check(); // Garante que o usuário está logado
 
-        // Fetch the combined venue and address data to pre-fill the form
-        $venue = Venue::readOne($id);
+    // O seu método readOne() já busca os dados da quadra e do endereço juntos, o que é perfeito.
+    $venueData = Venue::readOne($id);
 
-        if (!$venue) {
-            // Handle case where venue doesn't exist
-            echo "Quadra não encontrada.";
-            exit;
-        }
-
-        // Pass the $venue data to the view
-        require BASE_PATH . '/app/views/venues/edit.php';
+    // Garante que o local pertence ao usuário logado, por segurança.
+    if (!$venueData || $venueData['user_id'] != $_SESSION['user_id']) {
+        // Redireciona se o usuário tentar editar um local que não é seu
+        header('Location: ' . BASE_URL . '/quadras?error=not_found');
+        exit;
     }
+
+    // Prepara os dados para a view
+    $data = [
+        'venue' => $venueData
+    ];
+
+    // Carrega a nova view de edição e passa os dados
+    require_once BASE_PATH . '/app/views/venues/edit.php'; // Ajuste o caminho se necessário
+}
 
     /**
      * Update the specified venue and its address in the database.
      * @param int $id The ID of the venue to update.
      */
     public function update($id)
-    {
-        var_dump($_POST);
-        die();
+{
+    // Garante que o usuário está logado
+    AuthHelper::check();
 
-        AuthHelper::check();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-            // Passo 1: Atualizar a tabela de Endereços
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        
+        try {
+            // --- ETAPA 1: ATUALIZAR O ENDEREÇO ---
+            // Você precisará de um modelo Address com um método update
             $address = new Address();
-            $address->id = $_POST['address_id']; // Vem do campo oculto do formulário
-            $address->cep = htmlspecialchars($_POST['cep']);
-            $address->street = htmlspecialchars($_POST['street']);
-            $address->number = htmlspecialchars($_POST['number']);
-            $address->neighborhood = htmlspecialchars($_POST['neighborhood']);
-            $address->complement = htmlspecialchars($_POST['complement']);
-            $address->city = htmlspecialchars($_POST['city']);
-            $address->state = htmlspecialchars($_POST['state']);
-            $addressUpdated = $address->update(); // Chama o método de atualização do Address
+            $address->id = $_POST['address_id'];
+            $address->cep = $_POST['cep'];
+            $address->street = $_POST['street'];
+            $address->number = $_POST['number'];
+            $address->neighborhood = $_POST['neighborhood'];
+            $address->city = $_POST['city'];
+            $address->state = $_POST['state'];
+            // Adicione a lógica de geocodificação aqui se necessário
+            $address->update(); // Supondo que este método existe no seu Address.php
 
-            // Passo 2: Atualizar a tabela de Quadras (Venue)
+            // --- ETAPA 2: ATUALIZAR O LOCAL (VENUE) ---
             $venue = new Venue();
-            $venue->id = $id;
-            // ... (resto dos campos da quadra) ...
-            $venueUpdated = $venue->update();
+            $venue->id = $id; // O ID vem da URL
+            $venue->name = $_POST['name'];
+            $venue->average_price_per_hour = $_POST['average_price_per_hour'];
+            $venue->court_capacity = $_POST['court_capacity'];
+            $venue->floor_type = $_POST['floor_type'];
+            $venue->has_leisure_area = $_POST['has_leisure_area'] ?? 0;
+            $venue->leisure_area_capacity = $_POST['leisure_area_capacity'] ?? 0;
+            $venue->has_lighting = $_POST['has_lighting'] ?? 0;
+            $venue->is_covered = $_POST['is_covered'] ?? 0;
+            $venue->status = $_POST['status'] ?? 'available';
+            
+            $venue->update(); // Usa o método update do seu Venue.php
 
-            if ($venueUpdated && $addressUpdated) {
-                header('Location: ' . BASE_URL . '/quadras');
-                exit;
-            } else {
-                echo "Erro ao atualizar a quadra ou o endereço.";
-            }
+            // ETAPA 3: PROCESSAR NOVAS IMAGENS (opcional, mas recomendado)
+            // if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+            //     // Lógica para apagar imagens antigas e salvar as novas...
+            // }
+
+            // --- ETAPA 4: REDIRECIONAR COM SUCESSO ---
+            header('Location: ' . BASE_URL . '/quadras?status=updated_success');
+            exit;
+
+        } catch (Exception $e) {
+            // Em caso de erro, redireciona de volta para a página de edição
+            // error_log($e->getMessage()); // É uma boa prática logar o erro
+            header('Location: ' . BASE_URL . '/quadras/editar/' . $id . '?status=error');
+            exit;
         }
     }
+}
 
     /**
      * "Soft delete" the specified venue.

@@ -1,4 +1,7 @@
 <?php
+// Inicia a sessão para toda a aplicação.
+// Esta linha deve ser a primeira coisa no seu script.
+session_start();
 
 //Mostrar todos os erros para depuração
 ini_set('display_errors', 1);
@@ -6,7 +9,7 @@ error_reporting(E_ALL);
 
 // --- Constantes e Configurações Globais ---
 define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/colae');
+define('BASE_URL', '/colae'); // Ajuste se o seu projeto estiver noutra pasta
 require_once BASE_PATH . '/config.php';
 
 // --- Inclusão dos Controllers ---
@@ -41,6 +44,8 @@ $router->get('/dashboard', [UserController::class, 'dashboard']);
 $router->get('/dashboard/cpf', [UserController::class, 'addCpf']);
 $router->post('/dashboard/cpf', [UserController::class, 'storeCpf']);
 $router->get('/dashboard/profile', [UserController::class, 'profile']);
+// ROTA CORRIGIDA PARA CORRESPONDER AO FORMULÁRIO:
+$router->post('/dashboard/profile/update', [UserController::class, 'updateProfile']);
 
 
 // --- ROTAS DE QUADRAS (VENUES) ---
@@ -73,3 +78,4 @@ $router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete'])
 
 // Executa o roteador
 $router->dispatch();
+

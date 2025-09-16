@@ -1,138 +1,304 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Nova Quadra - Kolaê</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Novo Local - Kolae</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
+<body class="bg-[#0D1117] text-gray-200">
 
-<body class="bg-gray-100 font-sans">
+    <div class="flex flex-col h-screen">
+        <!-- Cabeçalho -->
+        <header class="py-4 px-8 flex justify-between items-center border-b border-gray-800">
+            <a href="<?php echo BASE_URL; ?>/dashboard" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
+            <a href="<?php echo BASE_URL; ?>/quadras" class="text-sm font-semibold bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-full transition-colors">Salvar e Sair</a>
+        </header>
 
-    <header class="bg-white shadow-sm">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            </nav>
-    </header>
-
-    <main class="container mx-auto px-6 py-8">
-        
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Cadastrar Nova Quadra</h1>
-
-            <div class="bg-white rounded-lg shadow-md p-8">
-                <form action="<?php echo BASE_URL; ?>/quadras/salvar" method="POST" enctype="multipart/form-data">
-                    
-                    <section class="mb-8">
-                        <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6">Dados da Quadra</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2">
-                                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nome do Local:</label>
-                                <input type="text" id="name" name="name" required minlength="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label for="average_price_per_hour" class="block text-gray-700 text-sm font-bold mb-2">Preço Médio/Hora:</label>
-                                <input type="number" step="0.01" min="0.01" id="average_price_per_hour" name="average_price_per_hour" placeholder="Ex: 50.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label for="court_capacity" class="block text-gray-700 text-sm font-bold mb-2">Capacidade da Quadra:</label>
-                                <input type="number" id="court_capacity" name="court_capacity" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label for="leisure_area_capacity" class="block text-gray-700 text-sm font-bold mb-2">Cap. Área de Lazer:</label>
-                                <input type="number" id="leisure_area_capacity" name="leisure_area_capacity" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label for="floor_type" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Piso:</label>
-                                <select id="floor_type" name="floor_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                                    <option value="grama natural">Grama Natural</option>
-                                    <option value="grama sintética">Grama Sintética</option>
-                                    <option value="cimento">Cimento</option>
-                                    <option value="areia">Areia</option>
-                                    <option value="saibro">Saibro</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
-                            <fieldset>
-                                <legend class="text-gray-700 text-sm font-bold mb-2">Área de Lazer?</legend>
-                                <div class="flex items-center space-x-4">
-                                    <label class="flex items-center"><input type="radio" name="has_leisure_area" value="1" class="mr-2"> Sim</label>
-                                    <label class="flex items-center"><input type="radio" name="has_leisure_area" value="0" checked class="mr-2"> Não</label>
-                                </div>
-                            </fieldset>
-                            <fieldset>
-                                <legend class="text-gray-700 text-sm font-bold mb-2">Iluminação?</legend>
-                                <div class="flex items-center space-x-4">
-                                    <label class="flex items-center"><input type="radio" name="has_lighting" value="1" class="mr-2"> Sim</label>
-                                    <label class="flex items-center"><input type="radio" name="has_lighting" value="0" checked class="mr-2"> Não</label>
-                                </div>
-                            </fieldset>
-                            <fieldset>
-                                <legend class="text-gray-700 text-sm font-bold mb-2">É Coberto?</legend>
-                                <div class="flex items-center space-x-4">
-                                    <label class="flex items-center"><input type="radio" name="is_covered" value="1" class="mr-2"> Sim</label>
-                                    <label class="flex items-center"><input type="radio" name="is_covered" value="0" checked class="mr-2"> Não</label>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </section>
-                    
-                    <section class="mb-8">
-                        <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6">Endereço</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div class="md:col-span-1">
-                                <label for="cep" class="block text-gray-700 text-sm font-bold mb-2">CEP:</label>
-                                <input type="text" id="cep" name="cep" required placeholder="00000-000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                             <div class="md:col-span-3">
-                                <label for="street" class="block text-gray-700 text-sm font-bold mb-2">Rua/Avenida:</label>
-                                <input type="text" id="street" name="street" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="md:col-span-1">
-                                <label for="number" class="block text-gray-700 text-sm font-bold mb-2">Número:</label>
-                                <input type="text" id="number" name="number" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="md:col-span-3">
-                                <label for="neighborhood" class="block text-gray-700 text-sm font-bold mb-2">Bairro:</label>
-                                <input type="text" id="neighborhood" name="neighborhood" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="md:col-span-3">
-                                <label for="city" class="block text-gray-700 text-sm font-bold mb-2">Cidade:</label>
-                                <input type="text" id="city" name="city" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="md:col-span-1">
-                                <label for="state" class="block text-gray-700 text-sm font-bold mb-2">Estado:</label>
-                                <input type="text" id="state" name="state" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <section>
-                         <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-6">Imagens da Quadra</h2>
-                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                             <label for="images" class="cursor-pointer">
-                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <span class="mt-2 block text-sm font-medium text-gray-600">Clique para selecionar as imagens</span>
-                                <span class="mt-1 block text-xs text-gray-500">PNG, JPG, JPEG</span>
-                             </label>
-                             <input type="file" id="images" name="images[]" multiple accept="image/jpeg, image/png" class="sr-only">
-                         </div>
-                    </section>
-                    
-                    <div class="flex justify-end space-x-4 mt-8">
-                         <a href="<?php echo BASE_URL; ?>/quadras" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">
-                            Cancelar
-                        </a>
-                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
-                            Salvar Local
-                        </button>
+        <!-- Conteúdo Principal -->
+        <main class="flex-grow flex items-center justify-center">
+            <form id="venue-form" action="<?php echo BASE_URL; ?>/quadras/salvar" method="POST" enctype="multipart/form-data" class="w-full h-full flex flex-col">
+                
+                <!-- Etapa 1: Tipo de Piso -->
+                <div id="step-1" class="step active w-full max-w-2xl mx-auto p-8">
+                    <h2 class="text-4xl font-bold text-white mb-8">Qual o tipo de piso principal do seu local?</h2>
+                    <div class="space-y-4" data-input-name="floor_type">
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama sintética"><h3 class="font-semibold text-lg">Grama Sintética</h3></div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="cimento"><h3 class="font-semibold text-lg">Cimento / Poliesportivo</h3></div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="areia"><h3 class="font-semibold text-lg">Areia</h3></div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="saibro"><h3 class="font-semibold text-lg">Saibro</h3></div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama natural"><h3 class="font-semibold text-lg">Grama Natural</h3></div>
                     </div>
+                </div>
 
-                </form>
+                <!-- Etapa 2: Detalhes Básicos (Capacidade da Quadra) -->
+                <div id="step-2" class="step w-full max-w-2xl mx-auto p-8">
+                    <h2 class="text-4xl font-bold text-white mb-8">Qual a capacidade da sua quadra?</h2>
+                    <p class="text-gray-400 mb-8">Refere-se ao número de jogadores em campo ao mesmo tempo (ex: 10 para um campo de society).</p>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <label class="font-semibold text-lg">Jogadores</label>
+                            <div class="counter-input flex items-center gap-4" data-input-name="court_capacity" data-min-value="2">
+                                <button type="button" class="counter-btn minus w-10 h-10 rounded-full border border-gray-600 text-gray-400 hover:bg-gray-700">-</button>
+                                <span class="counter-value text-lg font-bold">2</span>
+                                <button type="button" class="counter-btn plus w-10 h-10 rounded-full border border-gray-600 text-gray-400 hover:bg-gray-700">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etapa 3: Comodidades (Checkboxes) -->
+                <div id="step-3" class="step w-full max-w-3xl mx-auto p-8">
+                     <h2 class="text-4xl font-bold text-white mb-8">Informe aos jogadores o que seu espaço tem a oferecer</h2>
+                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="has_lighting" value="1" class="hidden">
+                            <i class="fas fa-lightbulb text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Iluminação</span>
+                        </label>
+                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="is_covered" value="1" class="hidden">
+                            <i class="fas fa-cloud-sun text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Quadra Coberta</span>
+                        </label>
+                         <label id="leisure-area-checkbox-card" class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="has_leisure_area" value="1" class="hidden">
+                            <i class="fas fa-utensils text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Área de Lazer</span>
+                        </label>
+                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="has_wifi" value="1" class="hidden">
+                            <i class="fas fa-wifi text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Wi-fi</span>
+                        </label>
+                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="has_parking" value="1" class="hidden">
+                            <i class="fas fa-parking text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Estacionamento</span>
+                        </label>
+                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                            <input type="checkbox" name="has_locker_room" value="1" class="hidden">
+                            <i class="fas fa-shower text-2xl text-gray-400 mb-2"></i>
+                            <span class="font-semibold text-base">Vestiário</span>
+                        </label>
+                     </div>
+                     <!-- Contador de capacidade da área de lazer (inicialmente oculto) -->
+                    <div id="leisure-capacity-container" class="hidden mt-8 animate-fadeIn">
+                        <hr class="border-gray-800 mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">Qual a capacidade da sua área de lazer?</h3>
+                         <div class="flex justify-between items-center max-w-xs">
+                            <label class="font-semibold text-lg">Pessoas</label>
+                            <div class="counter-input flex items-center gap-4" data-input-name="leisure_area_capacity" data-min-value="0">
+                                <button type="button" class="counter-btn minus w-10 h-10 rounded-full border border-gray-600 text-gray-400 hover:bg-gray-700">-</button>
+                                <span class="counter-value text-lg font-bold">0</span>
+                                <button type="button" class="counter-btn plus w-10 h-10 rounded-full border border-gray-600 text-gray-400 hover:bg-gray-700">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etapa 4: Nome e Preço -->
+                <div id="step-4" class="step w-full max-w-2xl mx-auto p-8">
+                    <h2 class="text-4xl font-bold text-white mb-8">Agora, dê um nome e defina um preço</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-400 text-sm font-bold mb-2">Nome do Local</label>
+                            <input type="text" id="name" name="name" required minlength="3" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500" placeholder="Ex: Arena Kolaê">
+                        </div>
+                        <div>
+                            <label for="average_price_per_hour" class="block text-gray-400 text-sm font-bold mb-2">Preço Médio por Hora (R$)</label>
+                            <input type="number" step="0.01" min="0.01" id="average_price_per_hour" name="average_price_per_hour" placeholder="Ex: 50.00" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etapa 5: Endereço -->
+                <div id="step-5" class="step w-full max-w-2xl mx-auto p-8">
+                     <h2 class="text-4xl font-bold text-white mb-8">Onde fica o seu local?</h2>
+                     <div class="space-y-4">
+                         <div>
+                            <label for="cep" class="block text-gray-400 text-sm font-bold mb-2">CEP</label>
+                            <input type="text" id="cep" name="cep" required placeholder="00000-000" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500">
+                         </div>
+                         <div class="grid grid-cols-3 gap-4">
+                             <div class="col-span-2"><label for="street" class="block text-gray-400 text-sm font-bold mb-2">Rua</label><input type="text" id="street" name="street" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                            <div><label for="number" class="block text-gray-400 text-sm font-bold mb-2">Número</label><input type="text" id="number" name="number" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                         </div>
+                         <div><label for="neighborhood" class="block text-gray-400 text-sm font-bold mb-2">Bairro</label><input type="text" id="neighborhood" name="neighborhood" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                          <div class="grid grid-cols-3 gap-4">
+                             <div class="col-span-2"><label for="city" class="block text-gray-400 text-sm font-bold mb-2">Cidade</label><input type="text" id="city" name="city" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                            <div><label for="state" class="block text-gray-400 text-sm font-bold mb-2">Estado</label><input type="text" id="state" name="state" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                         </div>
+                     </div>
+                </div>
+
+                <!-- Etapa 6: Upload de Fotos -->
+                <div id="step-6" class="step w-full max-w-2xl mx-auto p-8">
+                    <h2 class="text-4xl font-bold text-white mb-8">Faça seu local se destacar com fotos</h2>
+                    <div id="drop-area" class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label for="images" class="cursor-pointer"><i class="fas fa-cloud-upload-alt text-5xl text-gray-500"></i><p class="mt-4 font-semibold">Arraste e solte suas fotos aqui</p><p class="text-sm text-gray-500">ou clique para selecionar</p><input type="file" id="images" name="images[]" multiple accept="image/jpeg, image/png" class="hidden"></label>
+                    </div>
+                    <div id="preview-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                </div>
+
+            </form>
+        </main>
+
+        <!-- Rodapé de Navegação -->
+        <footer class="w-full p-4 border-t border-gray-800">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-full bg-gray-700 rounded-full h-1.5 mb-4">
+                    <div id="progress-bar" class="bg-cyan-400 h-1.5 rounded-full" style="width: 16.6%"></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <button id="prev-btn" class="font-bold py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors underline">Voltar</button>
+                    <button id="next-btn" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-8 rounded-lg transition-colors">Avançar</button>
+                </div>
             </div>
-        </div>
-    </main>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('venue-form');
+            const steps = Array.from(document.querySelectorAll('.step'));
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.getElementById('progress-bar');
+            let currentStep = 0;
+            const totalSteps = steps.length;
+            const formData = {};
 
-    <script src="<?php echo BASE_URL; ?>/assets/js/script.js"></script>
+            function updateUI() {
+                steps.forEach((step, index) => step.classList.toggle('active', index === currentStep));
+                prevBtn.classList.toggle('invisible', currentStep === 0);
+                nextBtn.textContent = currentStep === totalSteps - 1 ? 'Concluir e Cadastrar' : 'Avançar';
+                progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < totalSteps - 1) {
+                    currentStep++;
+                    updateUI();
+                } else {
+                    for (const key in formData) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = key;
+                        hiddenInput.value = formData[key];
+                        form.appendChild(hiddenInput);
+                    }
+                    form.submit();
+                }
+            });
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    updateUI();
+                }
+            });
+
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const group = card.parentElement;
+                    group.querySelectorAll('.option-card').forEach(c => c.classList.remove('border-cyan-400', 'bg-cyan-500/10'));
+                    card.classList.add('border-cyan-400', 'bg-cyan-500/10');
+                    formData[group.dataset.inputName] = card.dataset.value;
+                });
+            });
+
+            document.querySelectorAll('.counter-input').forEach(counter => {
+                const valueSpan = counter.querySelector('.counter-value');
+                const inputName = counter.dataset.inputName;
+                const minValue = parseInt(counter.dataset.minValue, 10);
+                let value = parseInt(valueSpan.textContent, 10);
+                formData[inputName] = value;
+
+                counter.querySelector('.minus').addEventListener('click', () => {
+                    if (value > minValue) value--;
+                    valueSpan.textContent = value;
+                    formData[inputName] = value;
+                });
+                counter.querySelector('.plus').addEventListener('click', () => {
+                    value++;
+                    valueSpan.textContent = value;
+                    formData[inputName] = value;
+                });
+            });
+
+            document.querySelectorAll('.checkbox-card').forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                card.addEventListener('click', () => {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('border-cyan-400', checkbox.checked);
+                    card.classList.toggle('bg-cyan-500/10', checkbox.checked);
+                    card.querySelector('i').classList.toggle('text-cyan-400', checkbox.checked);
+                    
+                    if (card.id === 'leisure-area-checkbox-card') {
+                        document.getElementById('leisure-capacity-container').classList.toggle('hidden', !checkbox.checked);
+                        if (!checkbox.checked) {
+                            const leisureCounter = document.querySelector('[data-input-name="leisure_area_capacity"]');
+                            leisureCounter.querySelector('.counter-value').textContent = '0';
+                            formData['leisure_area_capacity'] = 0;
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('cep').addEventListener('blur', async function() {
+                const cep = this.value.replace(/\D/g, '');
+                if (cep.length === 8) {
+                    try {
+                        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                        const data = await response.json();
+                        if (!data.erro) {
+                            document.getElementById('street').value = data.logradouro;
+                            document.getElementById('neighborhood').value = data.bairro;
+                            document.getElementById('city').value = data.localidade;
+                            document.getElementById('state').value = data.uf;
+                            document.getElementById('number').focus();
+                        }
+                    } catch (error) { console.error('Erro ao buscar CEP:', error); }
+                }
+            });
+
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('images');
+            const previewContainer = document.getElementById('preview-container');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dropArea.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }));
+            ['dragenter', 'dragover'].forEach(eName => dropArea.addEventListener(eName, () => dropArea.classList.add('border-cyan-400', 'bg-gray-800/50')));
+            ['dragleave', 'drop'].forEach(eName => dropArea.addEventListener(eName, () => dropArea.classList.remove('border-cyan-400', 'bg-gray-800/50')));
+
+            const handleFiles = files => {
+                previewContainer.innerHTML = '';
+                [...files].forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const preview = document.createElement('div');
+                        preview.className = 'relative w-full aspect-square rounded-lg overflow-hidden';
+                        preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover"><button type="button" class="remove-btn absolute top-1 right-1 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center">&times;</button>`;
+                        previewContainer.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+            dropArea.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+            fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+            updateUI();
+        });
+    </script>
 </body>
 </html>
+

@@ -144,6 +144,7 @@ class User
     public function update()
     {
         $pdo = Database::getConnection();
+        // ATENÇÃO: Esta query é para o painel de admin, onde o email pode ser alterado.
         $query = "UPDATE users SET name = :name, email = :email, birthdate = :birthdate WHERE id = :id";
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':id', $this->id);
@@ -205,6 +206,17 @@ class User
         $stmt->execute(['token' => $token]);
     }
 
+    public static function updateProfileData($id, $name, $birthdate)
+    {
+        $pdo = Database::getConnection();
+        $query = "UPDATE users SET name = :name, birthdate = :birthdate WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':birthdate', $birthdate);
+        return $stmt->execute();
+    }
+
     public static function updateAvatarPath($userId, $avatarPath)
     {
         $pdo = Database::getConnection();
@@ -214,4 +226,6 @@ class User
         $stmt->bindParam(':id', $userId);
         return $stmt->execute();
     }
+
+    
 }

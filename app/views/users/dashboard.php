@@ -113,7 +113,7 @@
                         <p class="text-sm text-gray-400">Adicione uma nova quadra à plataforma.</p>
                     </div>
                 </a>
-                <a href="http://localhost/colae/dashboard/profile" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-gray-600 transition-all duration-300 transform hover:-translate-y-1">
+                <a href="http://localhost/colae/dashboard/perfil" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-gray-600 transition-all duration-300 transform hover:-translate-y-1">
                     <div class="bg-gray-500/10 p-4 rounded-xl"><i class="fas fa-cog text-3xl text-gray-400"></i></div>
                     <div>
                         <h3 class="font-bold text-lg text-white">Configurações da Conta</h3>
