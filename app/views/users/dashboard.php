@@ -1,76 +1,193 @@
 <?php
-AuthHelper::start(); // Garante que a sessão está iniciada 
-// Verifica se há mensagens de erro ou sucesso na URL
-$error = $_GET['error'] ?? null;
-$status = $_GET['status'] ?? null;
+// No início do seu ficheiro, garanta que a sessão está iniciada.
+// session_start(); 
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <title>Meu Painel - Kolaê</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Dashboard - Kolae</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-[#0D1117] text-gray-200">
 
-    <header class="bg-white shadow-sm">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <a href="<?php echo BASE_URL; ?>/dashboard" class="text-xl font-bold text-gray-800">Kolaê</a>
-                <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-blue-600">Meu Painel</a>
-                <a href="<?php echo BASE_URL; ?>/quadras" class="text-gray-600 hover:text-blue-500">Minhas Quadras</a>
-            </div>
-            <div>
-                <a href="<?php echo BASE_URL; ?>/logout" class="text-gray-600 hover:text-red-500 font-medium">Sair</a>
-            </div>
-        </nav>
-    </header>
+    <!-- ==================== CABEÇALHO DO USUÁRIO ==================== -->
+    <header class="bg-[#161B22] border-b border-gray-800 sticky top-0 z-30 py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="<?php echo BASE_URL; ?>/" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
 
-    <main class="container mx-auto px-6 py-8">
-        
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Bem-vindo(a), <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h1>
-            <p class="text-gray-600">Gerencie suas informações e quadras aqui.</p>
-        </div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-cyan-400 transition-colors">Meu Painel</a>
+                <a href="<?php echo BASE_URL; ?>/quadras" class="font-semibold text-gray-300 hover:text-cyan-400 transition-colors">Meus Locais</a>
+            </nav>
 
-        <?php if (empty($_SESSION['user_cpf'])): ?>
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
-                <div class="flex">
-                    <div class="py-1"><svg class="w-6 h-6 text-yellow-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
-                    <div>
-                        <p class="font-bold">Cadastro Pendente</p>
-                        <p class="text-sm">Para cadastrar e gerenciar suas quadras, por favor, valide seu CPF.
-                            <a href="<?php echo BASE_URL; ?>/dashboard/cpf" class="font-semibold text-yellow-800 hover:underline">Adicionar CPF agora</a>.
-                        </p>
+            <div class="relative">
+                <div id="user-menu-button" class="flex items-center gap-3 p-2 border border-gray-700 rounded-full cursor-pointer transition-colors hover:bg-gray-700/50">
+                    <i class="fas fa-bars text-lg"></i>
+                    <i class="fas fa-user-circle text-xl"></i>
+                </div>
+
+                <div id="profile-dropdown" class="absolute top-full right-0 mt-3 w-72 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible transform -translate-y-2 transition-all duration-300">
+                    <div class="p-4 border-b border-gray-700">
+                        <p class="font-semibold text-white"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Usuário'); ?></p>
+                        <p class="text-sm text-gray-400">Ver perfil</p>
                     </div>
+                    <ul class="py-2">
+                        <li class="md:hidden"><a href="<?php echo BASE_URL; ?>/quadras" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-store w-5 text-center text-gray-400"></i> Meus Locais</a></li>
+                        <li class="border-t border-gray-700 my-2 md:hidden"></li>
+
+                        <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
+                        <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Ajuda</a></li>
+                        <li class="border-t border-gray-700 my-2"></li>
+                        <li><a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-5 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i>Sair</a></li>
+                    </ul>
                 </div>
             </div>
-        <?php endif; ?>
-
-        <?php if ($error === 'cpf_required'): ?>
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
-                 <p class="font-bold">Ação necessária:</p>
-                 <p class="text-sm">Você precisa adicionar um CPF válido para poder cadastrar uma nova quadra. 
-                    <a href="<?php echo BASE_URL; ?>/dashboard/cpf" class="font-semibold text-yellow-800 hover:underline">Clique aqui para adicionar</a>.
-                </p>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($status === 'cpf_success'): ?>
-             <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-r-lg">
-                 <p class="font-bold">Sucesso!</p>
-                 <p class="text-sm">Seu CPF foi validado e agora você pode cadastrar suas quadras.</p>
-            </div>
-        <?php endif; ?>
-
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Acesso Rápido</h2>
-            <p>Use os links no menu superior para navegar entre as seções.</p>
         </div>
+    </header>
+
+    <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
+    <main class="container mx-auto px-4 py-10">
+
+        <!-- Notificações -->
+        <div class="mb-10 space-y-4">
+            <?php if (empty($_SESSION['user_cpf'])): ?>
+                <div class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+                    <i class="fas fa-exclamation-triangle text-xl flex-shrink-0"></i>
+                    <div>
+                        <p class="font-semibold">Complete seu perfil para continuar</p>
+                        <p class="text-sm">Para cadastrar e gerenciar seus locais, precisamos que valide seu CPF.</p>
+                    </div>
+                    <a href="<?php echo BASE_URL; ?>/dashboard/cpf" class="bg-yellow-400 text-black font-bold py-2 px-4 rounded-lg text-sm transition-colors hover:bg-yellow-300 mt-2 sm:mt-0 flex-shrink-0">Adicionar CPF</a>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['status']) && $_GET['status'] === 'cpf_success'): ?>
+                <div class="bg-green-500/10 border border-green-500/30 text-green-300 px-6 py-4 rounded-lg flex items-center gap-4">
+                    <i class="fas fa-check-circle text-xl"></i>
+                    <span>Seu CPF foi validado com sucesso! Agora você pode cadastrar seus locais.</span>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Seção de Boas-Vindas -->
+        <section class="mb-12">
+            <h1 class="text-4xl font-bold text-white">Bem-vindo(a), <span class="text-cyan-400"><?php echo explode(' ', htmlspecialchars($_SESSION['user_name'] ?? 'Usuário'))[0]; ?>!</span></h1>
+            <p class="mt-2 text-lg text-gray-400">Gerencie suas informações e locais aqui.</p>
+        </section>
+
+        <!-- Seção de Ações Rápidas -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="<?php echo BASE_URL; ?>/quadras" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="bg-cyan-500/10 p-4 rounded-xl"><i class="fas fa-store text-3xl text-cyan-400"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">Meus Locais</h3>
+                        <p class="text-sm text-gray-400">Veja e edite suas quadras cadastradas.</p>
+                    </div>
+                </a>
+                <a href="<?php echo BASE_URL; ?>/quadras/criar" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-green-400 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="bg-green-500/10 p-4 rounded-xl"><i class="fas fa-plus-circle text-3xl text-green-400"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">Cadastrar Novo Local</h3>
+                        <p class="text-sm text-gray-400">Adicione uma nova quadra à plataforma.</p>
+                    </div>
+                </a>
+                <a href="http://localhost/colae/dashboard/profile" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-gray-600 transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="bg-gray-500/10 p-4 rounded-xl"><i class="fas fa-cog text-3xl text-gray-400"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">Configurações da Conta</h3>
+                        <p class="text-sm text-gray-400">Edite suas informações pessoais.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Seção de Visão Geral de "Meus Locais" (Estilo Airbnb) -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6 text-white">Visão Geral dos Seus Locais</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+                <?php if (!empty($data['userVenues'])): ?>
+                    <?php foreach ($data['userVenues'] as $venue): ?>
+                        <div class="group">
+                            <a href="<?php echo BASE_URL; ?>/quadras/editar/<?php echo $venue['id']; ?>">
+                                <div class="relative overflow-hidden rounded-xl">
+                                    <?php
+                                    $imagePath = BASE_URL . '/public/uploads/venues/' . $venue['id'] . '/' . ($venue['image_path'] ?? '');
+                                    $placeholder = 'https://placehold.co/600x400/161B22/E0E0E0?text=Sem+Imagem';
+                                    $imageSrc = !empty($venue['image_path']) ? $imagePath : $placeholder;
+                                    ?>
+                                    <img src="<?php echo $imageSrc; ?>" alt="Foto de <?php echo htmlspecialchars($venue['name']); ?>" class="w-full h-full object-cover aspect-video transform group-hover:scale-105 transition-transform duration-300">
+                                </div>
+                                <div class="mt-3">
+                                    <h3 class="font-bold text-white truncate"><?php echo htmlspecialchars($venue['name']); ?></h3>
+                                    <p class="text-sm text-gray-400 truncate"><?php echo htmlspecialchars($venue['street'] . ', ' . $venue['number']); ?></p>
+                                </div>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-span-full text-center py-12 bg-[#161B22] rounded-2xl border border-gray-800">
+                        <i class="fas fa-store-slash text-5xl text-gray-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-white">Nenhum local cadastrado</h3>
+                        <p class="text-gray-400 mt-2">Parece que você ainda não adicionou nenhuma quadra ou espaço esportivo.</p>
+                        <a href="<?php echo BASE_URL; ?>/quadras/criar" class="mt-6 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Cadastre seu primeiro local
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
 
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+
+            if (userMenuButton) {
+                userMenuButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('opacity-0');
+                    profileDropdown.classList.toggle('invisible');
+                    profileDropdown.classList.toggle('-translate-y-2');
+                });
+            }
+
+            window.addEventListener('click', (event) => {
+                if (profileDropdown && !profileDropdown.classList.contains('invisible')) {
+                    if (!profileDropdown.contains(event.target) && !userMenuButton.contains(event.target)) {
+                        profileDropdown.classList.add('opacity-0', 'invisible', '-translate-y-2');
+                    }
+                }
+            });
+        });
+    </script>
+
 </body>
+
 </html>

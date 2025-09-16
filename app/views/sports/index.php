@@ -1,77 +1,151 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciar Esportes - Kolaê</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Esportes - Kolae Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-[#0D1117] text-gray-200">
 
-    <header class="bg-white shadow-md">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <a href="#" class="text-xl font-bold text-gray-800">Kolaê Admin</a>
-                <a href="<?php echo BASE_URL; ?>/admin" class="text-gray-600 hover:text-blue-500">Dashboard</a>
-                <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="text-gray-600 hover:text-blue-500">Usuários</a>
-                <a href="<?php echo BASE_URL; ?>/admin/esportes" class="font-bold text-blue-600">Esportes</a> <a href="<?php echo BASE_URL; ?>/admin/mapa" class="text-gray-600 hover:text-blue-500">Mapa</a>
-            </div>
-            <div>
-                <a href="<?php echo BASE_URL; ?>/logout" class="text-red-500 hover:text-red-700 font-semibold">Sair</a>
-            </div>
-        </nav>
-    </header>
+    <div>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-[#161B22] border-r border-gray-800 flex flex-col transition-transform -translate-x-full md:translate-x-0">
+            <!-- Botão de Fechar para Mobile -->
+            <button id="sidebar-close-btn" class="md:hidden absolute top-4 right-4 text-gray-500 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
 
-    <main class="container mx-auto px-6 py-8">
-        
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Lista de Esportes</h1>
-            <div class="flex items-center space-x-2">
-                <a href="<?php echo BASE_URL; ?>/admin" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg">
-                    Voltar
+            <!-- Logo & User Info -->
+            <div class="p-6 text-center border-b border-gray-800">
+                <div class="w-24 h-24 rounded-full bg-gray-700 mx-auto flex items-center justify-center mb-4">
+                    <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
+                </div>
+                <h2 class="text-xl font-bold">
+                    <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                </h2>
+                <p class="text-sm text-gray-400">Admin Kolae</p>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="<?php echo BASE_URL; ?>/admin" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                    <i class="fas fa-home w-5 text-center"></i>
+                    <span>Início</span>
                 </a>
-                <a href="<?php echo BASE_URL; ?>/esportes/criar" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Cadastrar Esporte
+                <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                    <i class="fas fa-users w-5 text-center"></i>
+                    <span>Usuários</span>
+                </a>
+                <a href="<?php echo BASE_URL; ?>/admin/esportes" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold bg-cyan-500/10 text-cyan-400 rounded-lg">
+                    <i class="fas fa-running w-5 text-center"></i>
+                    <span>Esportes</span>
+                </a>
+                <a href="<?php echo BASE_URL; ?>/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                    <i class="fas fa-map-marker-alt w-5 text-center"></i>
+                    <span>Locais</span>
+                </a>
+            </nav>
+
+            <!-- Logout -->
+            <div class="p-4 border-t border-gray-800">
+                <a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                    <span>Sair</span>
                 </a>
             </div>
-        </div>
+        </aside>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <?php if (isset($sports) && count($sports) > 0): ?>
-                            <?php foreach ($sports as $row): ?>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo $row['id']; ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="<?php echo BASE_URL; ?>/esportes/editar/<?php echo $row['id']; ?>" class="text-indigo-600 hover:text-indigo-900">Editar</a>
-                                        <a href="<?php echo BASE_URL; ?>/esportes/excluir/<?php echo $row['id']; ?>" class="text-red-600 hover:text-red-900 ml-4" onclick="return confirm('Tem certeza?')">Excluir</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-gray-500">Nenhum esporte encontrado!</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+        <!-- Overlay para fechar o menu em mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="md:ml-64 flex-1 p-6 sm:p-10">
+            <!-- Botão Hamburger para Mobile -->
+            <button id="sidebar-toggle" class="md:hidden mb-6 text-gray-400 hover:text-white">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                <h1 class="text-3xl font-bold mb-4 sm:mb-0">Gerenciar Esportes</h1>
+                <a href="http://localhost/colae/admin/esportes/criar" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Novo Esporte
+                </a>
             </div>
-        </div>
-    </main>
 
+            <!-- Search Bar -->
+            <div class="mb-8">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i class="fas fa-search text-gray-500"></i>
+                    </span>
+                    <input type="text" placeholder="Pesquisar esporte..." class="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-md py-2 pl-10 pr-4 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                </div>
+            </div>
+
+            <!-- Sports Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+
+                <?php if (!empty($data['sports'])): ?>
+                    <?php foreach ($data['sports'] as $sport): ?>
+                        <div class="group relative bg-[#161B22] p-6 rounded-2xl border border-gray-800 text-center flex flex-col items-center justify-center aspect-square transition-all duration-300 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/10">
+                            <i class="fas <?php echo htmlspecialchars($sport['icon'] ?? 'fa-question-circle'); ?> text-5xl text-gray-400 transition-colors group-hover:text-cyan-400"></i>
+                            <h3 class="mt-4 font-bold text-lg"><?php echo htmlspecialchars($sport['name']); ?></h3>
+
+                            <!-- Action Buttons (visible on hover) -->
+                            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                                <a href="<?php echo BASE_URL; ?>/admin/esportes/editar/<?php echo $sport['id']; ?>" class="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full hover:bg-cyan-500 hover:text-black" title="Editar"><i class="fas fa-pencil-alt text-xs"></i></a>
+                                <a href="<?php echo BASE_URL; ?>/admin/esportes/excluir/<?php echo $sport['id']; ?>" class="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full hover:bg-red-500 hover:text-white" title="Excluir"><i class="fas fa-trash-alt text-xs"></i></a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="col-span-full text-center text-gray-500">Nenhum esporte encontrado.</p>
+                <?php endif; ?>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const closeBtn = document.getElementById('sidebar-close-btn');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        toggleBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+    </script>
 </body>
+
 </html>

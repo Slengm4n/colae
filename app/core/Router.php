@@ -23,7 +23,7 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        
+
         // Remove a pasta base (BASE_URL) da URI da requisição
         $uri = '/'; // Valor padrão para a raiz
         if (strpos($requestUri, BASE_URL) === 0) {
@@ -38,15 +38,6 @@ class Router
             $uri = rtrim($uri, '/');
         }
 
-        // Descomente as linhas abaixo para depurar e ver exatamente qual URI o roteador está a tentar encontrar
-        // echo "Método: " . $method . "<br>";
-        // echo "URI Processada: " . $uri;
-        // echo "<pre>";
-        // print_r($this->routes[$method]);
-        // echo "</pre>";
-        // die();
-
-        // Procura uma correspondência exata primeiro
         if (isset($this->routes[$method][$uri])) {
             $this->executeHandler($this->routes[$method][$uri]);
             return;

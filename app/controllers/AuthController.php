@@ -1,31 +1,20 @@
 <?php
-// Inclui o autoload do Composer.
 
-require_once BASE_PATH . '/app/models/User.php';
-require_once BASE_PATH . '/app/core/AuthHelper.php';
-
-// Usa as classes do PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../core/AuthHelper.php';
 
 class AuthController
 {
+    /**
+     * Exibe o formulário de login.
+     */
     public function index()
     {
-        require_once BASE_PATH . '/app/views/auth/login.php';
+        require_once BASE_PATH . '/app/views/auth/login.php'; // Ou o caminho para o seu ficheiro de login
     }
 
     /**
-     * Mostra a página de registro de novo usuário.
-     */
-    public function register()
-    {
-        require_once BASE_PATH . '/app/views/auth/register.php';
-    }
-
-    /**
-     * Processa a tentativa de login.
+     * Processa a tentativa de login do usuário.
      */
     public function authenticate()
     {
@@ -33,84 +22,77 @@ class AuthController
             $email = $_POST['email'];
             $password = $_POST['password'];
 
+            // 1. Encontra o usuário pelo email
             $user = User::findByEmail($email);
 
+            // 2. Verifica se o usuário existe e se a senha está correta
             if ($user && password_verify($password, $user['password_hash'])) {
-                AuthHelper::start();
+
+                // 3. Login bem-sucedido: Inicia a sessão e guarda os dados do usuário
+                session_start();
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_role'] = $user['role'];
 
+                // 4. AQUI ESTÁ A CORREÇÃO: Redireciona para o dashboard correto
                 if ($user['role'] === 'admin') {
+                    // Se for admin, vai para o dashboard do admin
                     header('Location: ' . BASE_URL . '/admin');
                 } else {
+                    // Se for um usuário comum, vai para o dashboard do usuário
                     header('Location: ' . BASE_URL . '/dashboard');
                 }
                 exit;
             } else {
-
-                $error = "Email ou senha inválidos.";
-                require_once BASE_PATH . '/app/views/auth/login.php';
+                // 5. Falha no login: Redireciona de volta para a página de login com uma mensagem de erro
+                header('Location: ' . BASE_URL . '/login?error=credentials');
+                exit;
             }
         }
     }
 
-    /**
-     * Salva o novo usuário vindo do formulário de registro.
-     */
+    // ... Seus outros métodos (register, store, logout, etc.) continuam aqui ...
+
+    public function register()
+    {
+        require_once BASE_PATH . '/app/views/auth/register.php';
+    }
+
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = trim($_POST['name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $birthdate = $_POST['birthdate'] ?? '';
-            $password = $_POST['password'] ?? '';
+            $name = $_POST['name'];
+            $email = $_POST['email'];
+            $birthdate = $_POST['birthdate'];
+            $password = $_POST['password'];
+            $password_confirmation = $_POST['password_confirmation'];
 
-            if (empty($name) || empty($email) || empty($password) || empty($birthdate)) {
-                $error = "Todos os campos são obrigatórios.";
-                require_once BASE_PATH . '/app/views/auth/register.php';
-                return;
-            }
-
-            if (!$this->isOver18($birthdate)) {
-                $error = "Você deve ter pelo menos 18 anos para se registrar.";
-                require_once BASE_PATH . '/app/views/auth/register.php';
-                return;
-            }
-
-            if (User::findByEmail($email)) {
-                $error = "Este e-mail já está cadastrado.";
-                require_once BASE_PATH . '/app/views/auth/register.php';
-                return;
+            // Validação simples (pode ser melhorada)
+            if ($password !== $password_confirmation) {
+                // Idealmente, passe uma mensagem de erro para a view
+                header('Location: ' . BASE_URL . '/register?error=password_mismatch');
+                exit;
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
             if (User::create($name, $email, $birthdate, $password_hash)) {
-                header('Location: ' . BASE_URL . '/login?status=success');
+                // Redireciona para o login após o registo bem-sucedido
+                header('Location: ' . BASE_URL . '/login?status=registered');
                 exit;
             } else {
-                $error = "Ocorreu um erro ao criar sua conta.";
-                require_once BASE_PATH . '/app/views/auth/register.php';
+                header('Location: ' . BASE_URL . '/register?error=generic');
+                exit;
             }
         }
     }
 
-    /**
-     * Efetua o logout do usuário.
-     */
     public function logout()
-{
-        AuthHelper::start();
-        session_unset();
+    {
+        session_start();
         session_destroy();
         header('Location: ' . BASE_URL . '/login');
         exit;
-    }
-
-    public function showForgotPasswordForm()
-    {
-        require_once BASE_PATH . '/app/views/auth/forgot_password.php';
     }
 
     /**

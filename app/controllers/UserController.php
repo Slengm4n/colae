@@ -5,21 +5,32 @@
     class UserController
     {
 
-       public function dashboard()
-{
-    AuthHelper::check();
+        public function dashboard()
+        {
+            AuthHelper::check();
 
-    // A MUDANÇA ESTÁ AQUI:
-    // Só vamos ao banco de dados buscar o CPF se ele ainda não estiver na sessão.
-    // Isso impede que ele seja sobrescrito a cada recarregamento da página.
-    if (!isset($_SESSION['user_cpf']) || empty($_SESSION['user_cpf'])) {
-        $user = User::findById($_SESSION['user_id']);
-        $_SESSION['user_cpf'] = $user['cpf'];
-    }
+            // A MUDANÇA ESTÁ AQUI:
+            // Só vamos ao banco de dados buscar o CPF se ele ainda não estiver na sessão.
+            // Isso impede que ele seja sobrescrito a cada recarregamento da página.
+            if (!isset($_SESSION['user_cpf']) || empty($_SESSION['user_cpf'])) {
+                $user = User::findById($_SESSION['user_id']);
+                $_SESSION['user_cpf'] = $user['cpf'];
+            }
 
-    // O resto do seu código pode continuar normal para carregar a view
-    require_once BASE_PATH . '/app/views/users/dashboard.php';
-} 
+            // O resto do seu código pode continuar normal para carregar a view
+            require_once BASE_PATH . '/app/views/users/dashboard.php';
+        }
+
+        public function profile()
+        {
+            AuthHelper::check();
+            $userData = User::findById($_SESSION['user_id']);
+            $data = [
+                'user' => $userData
+            ];
+            require_once BASE_PATH . '/app/views/users/profile.php';
+        }
+
         public function index()
         {
             AuthHelper::check();
@@ -39,7 +50,7 @@
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
                 if (User::create($_POST['name'], $_POST['email'], $_POST['birthdate'], $password_hash)) {
-                    header('Location: /colae/usuarios');
+                    header('Location: ' . BASE_URL . '/admin/usuarios');
                     exit;
                 } else {
                     echo "Erro ao criar usuário.";
@@ -116,6 +127,52 @@
             }
             return true;
         }
+
+        public function updateProfile() // Ou o nome do seu método de atualização
+        {
+            AuthHelper::check();
+
+            // Lógica para atualizar os dados do texto (nome, data de nascimento)
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $user = new User();
+                $user->id = $_SESSION['user_id'];
+                $user->name = htmlspecialchars($_POST['name']);
+                $user->birthdate = $_POST['birthdate'];
+
+                // Atualiza os dados de texto
+                $user->update();
+            }
+
+            // --- LÓGICA PARA O UPLOAD DA IMAGEM ---
+
+            // Verifica se um ficheiro foi enviado sem erros
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+
+                $file = $_FILES['avatar'];
+                $userId = $_SESSION['user_id'];
+
+                // Diretório para onde as imagens serão movidas
+                $uploadDir = BASE_PATH . '/public/uploads/avatars/';
+
+                // Usa o seu ImageHelper para processar e salvar a imagem
+                // Esta função deve retornar o nome do novo ficheiro ou `false` em caso de erro.
+                $newFileName = ImageHelper::processAndSave($file, $uploadDir, $userId);
+
+                if ($newFileName) {
+                    // Se o upload foi bem-sucedido, atualiza o caminho no banco de dados
+                    User::updateAvatarPath($userId, $newFileName);
+                } else {
+                    // Lida com o erro de upload, talvez redirecionando com uma mensagem
+                    header('Location: ' . BASE_URL . '/profile?status=upload_error');
+                    exit;
+                }
+            }
+
+            // Redireciona de volta para a página de perfil com uma mensagem de sucesso
+            header('Location: ' . BASE_URL . '/profile?status=updated_success');
+            exit;
+        }
+
 
         public function edit($id)
         {

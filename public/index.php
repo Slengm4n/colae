@@ -40,15 +40,16 @@ $router->post('/reset-password', [AuthController::class, 'resetPassword']);
 $router->get('/dashboard', [UserController::class, 'dashboard']);
 $router->get('/dashboard/cpf', [UserController::class, 'addCpf']);
 $router->post('/dashboard/cpf', [UserController::class, 'storeCpf']);
+$router->get('/dashboard/profile', [UserController::class, 'profile']);
 
 
 // --- ROTAS DE QUADRAS (VENUES) ---
-$router->get('/quadras', [VenueController::class,'index']);
-$router->get('/quadras/criar', [VenueController::class,'create']);
-$router->post('/quadras/salvar', [VenueController::class,'store']);
-$router->get('/quadras/editar/{id}', [VenueController::class,'edit']);
-$router->post('/quadras/atualizar/{id}', [VenueController::class,'update']);
-$router->get('/quadras/excluir/{id}', [VenueController::class,'delete']);
+$router->get('/quadras', [VenueController::class, 'index']);
+$router->get('/quadras/criar', [VenueController::class, 'create']);
+$router->post('/quadras/salvar', [VenueController::class, 'store']);
+$router->get('/quadras/editar/{id}', [VenueController::class, 'edit']);
+$router->post('/quadras/atualizar/{id}', [VenueController::class, 'update']);
+$router->get('/quadras/excluir/{id}', [VenueController::class, 'delete']);
 
 
 // --- ROTAS DO PAINEL ADMIN ---
@@ -72,4 +73,3 @@ $router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete'])
 
 // Executa o roteador
 $router->dispatch();
-

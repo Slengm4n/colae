@@ -18,13 +18,12 @@ class User
     {
         // Verifica se a extensão openssl está carregada
         if (!extension_loaded('openssl')) {
-            Logger::getInstance()->critical('Extensão OpenSSL não está habilitada. Não é possível criptografar o CPF.');
             return false;
         }
         $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
 
         if ($encrypted === false) {
-            Logger::getInstance()->critical('openssl_encrypt falhou. Verifique se ENCRYPTION_KEY e ENCRYPTION_IV estão corretas no config.php.');
+
             return false;
         }
         return $encrypted;
@@ -42,7 +41,7 @@ class User
 
         $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
 
-        if ($decrypted === false){ 
+        if ($decrypted === false) {
             return false; // Retorna false em caso de falha
         }
         return $decrypted;
@@ -204,5 +203,15 @@ class User
         $sql = "DELETE FROM password_resets WHERE token = :token";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['token' => $token]);
+    }
+
+    public static function updateAvatarPath($userId, $avatarPath)
+    {
+        $pdo = Database::getConnection();
+        $query = "UPDATE users SET avatar_path = :avatar_path WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':avatar_path', $avatarPath);
+        $stmt->bindParam(':id', $userId);
+        return $stmt->execute();
     }
 }
