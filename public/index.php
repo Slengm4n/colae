@@ -43,9 +43,9 @@ $router->post('/reset-password', [AuthController::class, 'resetPassword']);
 $router->get('/dashboard', [UserController::class, 'dashboard']);
 $router->get('/dashboard/cpf', [UserController::class, 'addCpf']);
 $router->post('/dashboard/cpf', [UserController::class, 'storeCpf']);
-$router->get('/dashboard/profile', [UserController::class, 'profile']);
+$router->get('/dashboard/perfil', [UserController::class, 'profile']);
 // ROTA CORRIGIDA PARA CORRESPONDER AO FORMULÁRIO:
-$router->post('/dashboard/profile/update', [UserController::class, 'updateProfile']);
+$router->post('/dashboard/perfil/atualizar', [UserController::class, 'updateProfile']);
 
 
 // --- ROTAS DE QUADRAS (VENUES) ---
@@ -78,4 +78,3 @@ $router->get('/admin/esportes/excluir/{id}', [SportController::class, 'delete'])
 
 // Executa o roteador
 $router->dispatch();
-

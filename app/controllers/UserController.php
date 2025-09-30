@@ -5,81 +5,113 @@
     class UserController
     {
 
-          public function dashboard()
-    {
-        AuthHelper::check();
+        public function dashboard()
+        {
+            AuthHelper::check();
 
-        // Busca o CPF do utilizador, se ainda não estiver na sessão
-        if (!isset($_SESSION['user_cpf']) || empty($_SESSION['user_cpf'])) {
-            $user = User::findById($_SESSION['user_id']);
-            $_SESSION['user_cpf'] = $user['cpf'] ?? null;
+            // Busca o CPF do utilizador, se ainda não estiver na sessão
+            if (!isset($_SESSION['user_cpf']) || empty($_SESSION['user_cpf'])) {
+                $user = User::findById($_SESSION['user_id']);
+                $_SESSION['user_cpf'] = $user['cpf'] ?? null;
+            }
+
+            // Busca os locais que pertencem ao utilizador logado
+            $userVenues = Venue::findByUserId($_SESSION['user_id']);
+
+            // Monta o array de dados para a view
+            $data = [
+                'userVenues' => $userVenues
+            ];
+
+            // Carrega a view do dashboard e passa os dados
+            require_once BASE_PATH . '/app/views/users/dashboard.php';
         }
-
-        // Busca os locais que pertencem ao utilizador logado
-        $userVenues = Venue::findByUserId($_SESSION['user_id']);
-
-        // Monta o array de dados para a view
-        $data = [
-            'userVenues' => $userVenues
-        ];
-
-        // Carrega a view do dashboard e passa os dados
-        require_once BASE_PATH . '/app/views/users/dashboard.php';
-    }
 
 
         public function profile()
-    {
-        AuthHelper::check();
-        $userData = User::findById($_SESSION['user_id']);
-        $data = [
-            'user' => $userData
-        ];
-        require_once BASE_PATH . '/app/views/users/profile.php';
-    }
+        {
+            AuthHelper::check();
+            $userData = User::findById($_SESSION['user_id']);
+            $data = [
+                'user' => $userData
+            ];
+            require_once BASE_PATH . '/app/views/users/profile.php';
+        }
 
-         public function updateProfile()
-    {
-        AuthHelper::check();
+        // Em /app/controllers/UserController.php
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
+        // Em /app/controllers/UserController.php
+        public function updateProfile()
+        {
+            AuthHelper::check();
+
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                header('Location: ' . BASE_URL . '/dashboard/perfil');
+                exit;
+            }
+
             $userId = $_SESSION['user_id'];
-            $name = htmlspecialchars($_POST['name']);
-            $birthdate = $_POST['birthdate'];
-            
-            // 1. Atualiza os dados de texto (nome, data de nascimento)
-            User::updateProfileData($userId, $name, $birthdate);
+            $currentUser = User::findById($userId);
+            $updateData = [];
 
-            // 2. Lógica para o upload da foto de perfil
+            // 1. Processa os dados de texto
+            if (isset($_POST['name']) && $_POST['name'] !== $currentUser['name']) {
+                // Sintaxe compatível para htmlspecialchars
+                $updateData['name'] = htmlspecialchars($_POST['name']);
+            }
+            if (isset($_POST['birthdate']) && $_POST['birthdate'] !== $currentUser['birthdate']) {
+                $updateData['birthdate'] = $_POST['birthdate'];
+            }
+
+            // 2. Processa o upload do avatar
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                
                 $file = $_FILES['avatar'];
-                
-                // Diretório de destino para os avatares
                 $uploadDir = BASE_PATH . '/public/uploads/avatars/';
-                
-                // Usa o seu ImageHelper para validar, mover, otimizar e salvar a imagem
-                $newFileName = ImageHelper::processAndSave($file, $uploadDir, $userId);
 
-                if ($newFileName) {
-                    // Se o upload foi bem-sucedido, guarda o novo nome do ficheiro no banco de dados
-                    User::updateAvatarPath($userId, $newFileName);
+                // Validações
+                if ($file['size'] > 10 * 1024 * 1024) { // 10MB
+                    $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Arquivo muito grande! (Máx 10MB)'];
+                    header('Location: ' . BASE_URL . '/dashboard/perfil');
+                    exit;
+                }
+
+                // Gera um nome único para o arquivo para evitar sobreescrever arquivos
+                $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                $newFileName = uniqid('avatar_', true) . '.' . $fileExtension;
+                $destination = $uploadDir . $newFileName;
+
+                // Tenta mover o novo arquivo (Sintaxe compatível)
+                if (move_uploaded_file($file['tmp_name'], $destination)) {
+                    // Se o upload deu certo, apaga o arquivo de avatar antigo (se existir)
+                    if (!empty($currentUser['avatar_path']) && file_exists($uploadDir . $currentUser['avatar_path'])) {
+                        unlink($uploadDir . $currentUser['avatar_path']);
+                    }
+                    // Adiciona o novo nome do arquivo para ser salvo no banco
+                    $updateData['avatar_path'] = $newFileName;
                 } else {
-                    // Se o upload falhar, redireciona com uma mensagem de erro
-                    header('Location: ' . BASE_URL . '/profile?status=upload_error');
+                    $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Falha ao fazer upload da imagem.'];
+                    header('Location: ' . BASE_URL . '/dashboard/perfil');
                     exit;
                 }
             }
 
-            // 3. Atualiza o nome na sessão para que a mudança apareça imediatamente no site
-            $_SESSION['user_name'] = $name;
+            // 3. Atualiza o banco de dados (se houver algo para atualizar)
+            if (!empty($updateData)) {
+                if (User::updateFields($userId, $updateData)) {
+                    $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Perfil atualizado com sucesso!'];
+                    if (isset($updateData['name'])) {
+                        $_SESSION['user_name'] = $updateData['name'];
+                    }
+                } else {
+                    $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Erro ao salvar os dados no banco.'];
+                }
+            }
 
-            // 4. Redireciona de volta para a página de perfil com uma mensagem de sucesso
-            header('Location: ' . BASE_URL . '/profile?status=updated_success');
+            // 4. Redireciona de volta para a página de perfil
+            header('Location: ' . BASE_URL . '/dashboard/perfil');
             exit;
         }
-    }
+
         public function index()
         {
             AuthHelper::check();

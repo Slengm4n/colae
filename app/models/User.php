@@ -206,26 +206,32 @@ class User
         $stmt->execute(['token' => $token]);
     }
 
-    public static function updateProfileData($id, $name, $birthdate)
+    // Em /app/models/User.php
+
+    // Mantenha seu método public function update() intacto!
+    // Adicione este novo método logo abaixo dele ou onde preferir dentro da classe.
+
+    public static function updateFields($id, array $data)
     {
+        if (empty($data)) {
+            return true;
+        }
+
         $pdo = Database::getConnection();
-        $query = "UPDATE users SET name = :name, birthdate = :birthdate WHERE id = :id";
+
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            $fields[] = "$key = :$key";
+        }
+        $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+
         $stmt = $pdo->prepare($query);
+
+        foreach ($data as $key => &$value) {
+            $stmt->bindParam(":$key", $value);
+        }
         $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':birthdate', $birthdate);
+
         return $stmt->execute();
     }
-
-    public static function updateAvatarPath($userId, $avatarPath)
-    {
-        $pdo = Database::getConnection();
-        $query = "UPDATE users SET avatar_path = :avatar_path WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':avatar_path', $avatarPath);
-        $stmt->bindParam(':id', $userId);
-        return $stmt->execute();
-    }
-
-    
 }
