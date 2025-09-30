@@ -1,1 +1,2 @@
-# colae
+#Kolae - Conecte-se pelo Esporte
+Kolae é uma plataforma web desenvolvida para conectar atletas e entusiastas do desporto a locais desportivos, como campos e quadras. A aplicação permite que proprietários de estabelecimentos cadastrem e administrem os seus locais, enquanto atletas podem encontrar o espaço ideal para praticar desporto. O projeto conta com um painel administrativo robusto para gestão completa da plataforma.
