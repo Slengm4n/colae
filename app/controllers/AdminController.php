@@ -3,31 +3,31 @@
 require_once __DIR__ . '/../core/AuthHelper.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Sport.php';
-// Adicione o seu modelo Venue (ou Locais)
 require_once __DIR__ . '/../models/Venue.php';
 
 class AdminController
 {
 
-
+    //Função index do dashboard
     public function dashboard()
     {
+        // Usa o AuthHelper para que só usuários com role admin possa logar e acessar a página
         AuthHelper::checkAdmin();
         try {
-            // Supondo que você pega o nome do usuário logado da sessão
-            // session_start(); // Garanta que a sessão foi iniciada
+            // Garante que a sessão foi iniciada
             $userName = $_SESSION['user_name'] ?? 'Admin';
 
-            // Busque os totais usando a contagem dos arrays
+            // Busque os totais usando a contagem dos arrays do métodos de cada Model
             $totalUsers = count(User::getAll());
             $totalSports = count(Sport::getAll());
-            $totalLocations = count(Venue::getAll()); // Usando seu modelo Venue
+            $totalLocations = count(Venue::getAll());
 
-            // Pegue apenas os 5 usuários mais recentes para a tabela
+            // Pegando apenas os 5 usuários mais recentes para a tabela
             $allUsers = User::getAll();
             $recentUsers = array_slice($allUsers, 0, 5);
 
-            // Monte o array $data com as chaves que a sua view no Canvas espera
+
+            // Monte o array $data com as chaves que a view no Canvas espera
             $data = [
                 'userName' => $userName,
                 'totalUsers' => $totalUsers,
@@ -36,8 +36,8 @@ class AdminController
                 'recentUsers' => $recentUsers
             ];
 
-            // Carregue a sua view do dashboard
-            // Certifique-se de que o caminho está correto
+
+            //Renderiza a view de dashboard de Admin
             require __DIR__ . '/../views/admin/dashboard.php';
         } catch (Exception $e) {
             echo "Erro ao carregar o dashboard: " . $e->getMessage();
@@ -45,14 +45,17 @@ class AdminController
     }
 
 
+    //Função para o mapa de quadras
     public function showMap()
     {
-        AuthHelper::checkAdmin(); // Garante que é um admin
+        // Usa o AuthHelper para que só usuários com role admin possa acessar a página
+        AuthHelper::checkAdmin();
 
         try {
+            // Garante que o usuário esteja logado
             $userName = $_SESSION['user_name'] ?? 'Admin';
 
-            // Busca todas as quadras com coordenadas do seu modelo
+            // Busca todas as quadras com coordenadas do Model Venue
             $venuesWithCoords = Venue::getAllWithCoordinates();
 
             // Prepara os dados para a view
@@ -60,8 +63,7 @@ class AdminController
                 'userName' => $userName
             ];
 
-            // Carrega a view do mapa
-            // A variável $venuesWithCoords estará disponível na view por causa do escopo
+            // Renderiza a view do mapa
             require __DIR__ . '/../views/admin/map.php';
         } catch (Exception $e) {
             echo "Erro ao carregar o mapa: " . $e->getMessage();
