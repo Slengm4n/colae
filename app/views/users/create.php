@@ -6,15 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Usuário - Kolae Admin</title>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome (para ícones) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -28,14 +25,11 @@
 <body class="bg-[#0D1117] text-gray-200">
 
     <div>
-        <!-- Sidebar -->
         <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-[#161B22] border-r border-gray-800 flex flex-col transition-transform -translate-x-full md:translate-x-0">
-            <!-- Botão de Fechar para Mobile -->
             <button id="sidebar-close-btn" class="md:hidden absolute top-4 right-4 text-gray-500 hover:text-white">
                 <i class="fas fa-times text-2xl"></i>
             </button>
 
-            <!-- Logo & User Info -->
             <div class="p-6 text-center border-b border-gray-800">
                 <div class="w-24 h-24 rounded-full bg-gray-700 mx-auto flex items-center justify-center mb-4">
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
@@ -49,7 +43,6 @@
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
 
-            <!-- Navigation -->
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <a href="<?php echo BASE_URL; ?>/admin" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-home w-5 text-center"></i>
@@ -69,7 +62,6 @@
                 </a>
             </nav>
 
-            <!-- Logout -->
             <div class="p-4 border-t border-gray-800">
                 <a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                     <i class="fas fa-sign-out-alt w-5 text-center"></i>
@@ -78,18 +70,14 @@
             </div>
         </aside>
 
-        <!-- Overlay para fechar o menu em mobile -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
 
-        <!-- Main Content -->
         <main class="md:ml-64 flex-1 p-6 sm:p-10">
-            <!-- Botão Hamburger para Mobile -->
             <button id="sidebar-toggle" class="md:hidden mb-6 text-gray-400 hover:text-white">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
             <h1 class="text-3xl font-bold mb-8">Criar Novo Usuário</h1>
 
-            <!-- Create User Form -->
             <div class="bg-[#161B22] p-8 rounded-2xl border border-gray-800 max-w-4xl mx-auto">
 
                 <form action="<?php echo BASE_URL; ?>/admin/usuarios/salvar" method="POST" class="space-y-6">
@@ -116,16 +104,12 @@
                     </div>
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-300">Senha</label>
+                        <label for="role" class="block text-sm font-medium text-gray-300">Cargo do Usuário</label>
                         <div class="mt-1">
-                            <input id="password" name="password" type="password" placeholder="••••••••" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-300">Confirme sua senha</label>
-                        <div class="mt-1">
-                            <input id="password_confirmation" name="password_confirmation" type="password" placeholder="••••••••" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                            <select id="role" name="role" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                                <option value="user" selected>Usuário Padrão</option>
+                                <option value="admin">Administrador</option>
+                            </select>
                         </div>
                     </div>
 

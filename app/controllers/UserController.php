@@ -125,19 +125,100 @@
             require __DIR__ . '/../views/users/create.php';
         }
 
-        public function store()
+        public function showForceChangePasswordForm()
         {
-            AuthHelper::checkAdmin();
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                if (User::create($_POST['name'], $_POST['email'], $_POST['birthdate'], $password_hash)) {
-                    header('Location: ' . BASE_URL . '/admin/usuarios');
-                    exit;
-                } else {
-                    echo "Erro ao criar usuário.";
-                }
-            }
+            // Apenas carrega a view
+            require_once BASE_PATH . '/app/views/users/force_change_password.php';
         }
+
+        public function storeNewPassword()
+        {
+            AuthHelper::check(); // Garante que o usuário está logado
+
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                header('Location: ' . BASE_URL . '/');
+                exit;
+            }
+
+            $newPassword = $_POST['new_password'];
+            $confirmPassword = $_POST['confirm_password'];
+            $userId = $_SESSION['user_id'];
+
+            // Validação
+            if (empty($newPassword) || strlen($newPassword) < 8) {
+                $error = "A senha deve ter no mínimo 8 caracteres.";
+                require_once BASE_PATH . '/app/views/users/force_change_password.php';
+                return;
+            }
+
+            if ($newPassword !== $confirmPassword) {
+                $error = "As senhas não coincidem.";
+                require_once BASE_PATH . '/app/views/users/force_change_password.php';
+                return;
+            }
+
+            // Tudo certo, vamos atualizar a senha
+            $password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+            // Atualiza a senha no banco
+            User::updatePassword($_SESSION['user_email'], $password_hash);
+
+            // Remove a flag de troca de senha obrigatória
+            User::clearPasswordChangeFlag($userId);
+
+            // Atualiza a sessão para refletir a mudança e evitar o redirect de novo
+            $_SESSION['force_password_change'] = 0;
+
+            // Redireciona para o dashboard com mensagem de sucesso
+            $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'Senha alterada com sucesso! Bem-vindo(a).'];
+            header('Location: ' . BASE_URL . '/dashboard');
+            exit;
+        }
+
+
+        // Em /app/controllers/UserController.php
+
+// Não se esqueça de adicionar este método auxiliar dentro da classe, se ainda não o fez.
+private function generateRandomPassword($length = 12) {
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|';
+    return substr(str_shuffle($chars), 0, $length);
+}
+
+public function store()
+{
+    AuthHelper::checkAdmin();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        
+        // 1. Captura e valida o cargo vindo do formulário
+        $allowed_roles = ['user', 'admin'];
+        $role = in_array($_POST['role'], $allowed_roles) ? $_POST['role'] : 'user';
+
+        // 2. Gera uma senha aleatória segura
+        $randomPassword = $this->generateRandomPassword();
+        
+        // 3. Criptografa a senha gerada para salvar no banco
+        $password_hash = password_hash($randomPassword, PASSWORD_DEFAULT);
+        
+        // 4. Chama o método User::create com todos os novos parâmetros
+        if (User::create($_POST['name'], $_POST['email'], $_POST['birthdate'], $password_hash, $role)) {
+            
+            // 5. Salva a senha e a mensagem na sessão para o pop-up (modal)
+            $_SESSION['flash_message'] = [
+                'type'     => 'success_with_password',
+                'message'  => 'Usuário criado com sucesso!',
+                'password' => $randomPassword
+            ];
+            
+            header('Location: ' . BASE_URL . '/admin/usuarios');
+            exit;
+        } else {
+            // Melhorando o tratamento de erro
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'Ocorreu um erro ao criar o usuário.'];
+            header('Location: ' . BASE_URL . '/admin/usuarios/criar');
+            exit;
+        }
+    }
+}
 
         public function addCpf()
         {
@@ -222,25 +303,30 @@
             require __DIR__ . '/../views/users/edit.php';
         }
 
-        public function update()
-        {
-            AuthHelper::checkAdmin();
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-                $user = new User();
-                $user->id = $_POST['id'];
-                $user->name = htmlspecialchars($_POST['name']);
-                $user->email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-                $user->birthdate = $_POST['birthdate'];
+        // Em /app/controllers/UserController.php
 
-                if ($user->update()) {
-                    header('Location: /colae/admin/usuarios');
-                    exit;
-                } else {
-                    header("Location: /colae/admin/usuarios/editar/" . $_POST['id'] . "?status=erro");
-                    exit;
-                }
-            }
+public function update()
+{
+    AuthHelper::checkAdmin();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+        $user = new User();
+        $user->id = $_POST['id'];
+        $user->name = htmlspecialchars($_POST['name']);
+        $user->email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+        $user->birthdate = $_POST['birthdate'];
+        
+        // ----> ADICIONE ESTA LINHA <----
+        $user->role = $_POST['role'];
+
+        if ($user->update()) {
+            header('Location: ' . BASE_URL . '/admin/usuarios');
+            exit;
+        } else {
+            header("Location: ". BASE_URL ."/admin/usuarios/editar/" . $_POST['id'] . "?status=erro");
+            exit;
         }
+    }
+}
 
         public function delete($id)
         {

@@ -123,6 +123,22 @@
                             </div>
                         </div>
 
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-300">Cargo do Usuário</label>
+                            <div class="mt-1">
+                                <select id="role" name="role" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+
+                                    <option value="user" <?php if ($userData['role'] === 'user') echo 'selected'; ?>>
+                                        Usuário Padrão
+                                    </option>
+                                    <option value="admin" <?php if ($userData['role'] === 'admin') echo 'selected'; ?>>
+                                        Administrador
+                                    </option>
+
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="pt-4 flex items-center space-x-4">
                             <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-6 rounded-lg transition-colors">
                                 Salvar Alterações

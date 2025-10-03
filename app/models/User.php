@@ -110,17 +110,24 @@ class User
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function create($name, $email, $birthdate, $password_hash)
-    {
-        $pdo = Database::getConnection();
-        $query = "INSERT INTO users (name, email, birthdate, password_hash, status) VALUES (:name, :email, :birthdate, :password_hash, 'active')";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':birthdate', $birthdate);
-        $stmt->bindParam(':password_hash', $password_hash);
-        return $stmt->execute();
-    }
+    // Em /app/models/User.php
+
+public static function create($name, $email, $birthdate, $password_hash, $role)
+{
+    $pdo = Database::getConnection();
+    $query = "INSERT INTO users (name, email, birthdate, password_hash, role, status, force_password_change) VALUES (:name, :email, :birthdate, :password_hash, :role, 'active', 1)";
+    $stmt = $pdo->prepare($query);
+
+    // CORREÇÃO: Garanta que todas as variáveis aqui começam com $
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':birthdate', $birthdate);
+    $stmt->bindParam(':password_hash', $password_hash);
+    $stmt->bindParam(':role', $role);
+    
+    // A linha 123, que dava o erro, agora deve funcionar
+    return $stmt->execute();
+}
 
     public function readOne($id)
     {
@@ -141,18 +148,27 @@ class User
         return $userData;
     }
 
-    public function update()
-    {
-        $pdo = Database::getConnection();
-        // ATENÇÃO: Esta query é para o painel de admin, onde o email pode ser alterado.
-        $query = "UPDATE users SET name = :name, email = :email, birthdate = :birthdate WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':email', $this->email);
-        $stmt->bindParam(':birthdate', $this->birthdate);
-        return $stmt->execute();
-    }
+    // Em /app/models/User.php
+
+public function update()
+{
+    $pdo = Database::getConnection();
+    
+    // 1. A query deve incluir o campo 'role'
+    $query = "UPDATE users SET name = :name, email = :email, birthdate = :birthdate, role = :role WHERE id = :id";
+    
+    $stmt = $pdo->prepare($query);
+    
+    // 2. Garanta que todos os 5 placeholders tenham um bindParam correspondente
+    $stmt->bindParam(':id', $this->id);
+    $stmt->bindParam(':name', $this->name);
+    $stmt->bindParam(':email', $this->email);
+    $stmt->bindParam(':birthdate', $this->birthdate);
+    $stmt->bindParam(':role', $this->role); // Esta linha provavelmente estava faltando
+    
+    // A linha 162, que dava o erro, agora deve funcionar
+    return $stmt->execute();
+}
 
     public static function delete($id)
     {
@@ -206,10 +222,14 @@ class User
         $stmt->execute(['token' => $token]);
     }
 
-    // Em /app/models/User.php
-
-    // Mantenha seu método public function update() intacto!
-    // Adicione este novo método logo abaixo dele ou onde preferir dentro da classe.
+    public static function clearPasswordChangeFlag($userId)
+    {
+        $pdo = Database::getConnection();
+        $query = "UPDATE users SET force_password_change = 0 WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':id', $userId);
+        return $stmt->execute();
+    }
 
     public static function updateFields($id, array $data)
     {
