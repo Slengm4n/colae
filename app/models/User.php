@@ -206,13 +206,18 @@ public function update()
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function updatePassword($email, $password_hash)
-    {
-        $pdo = Database::getConnection();
-        $sql = "UPDATE users SET password_hash = :password_hash WHERE email = :email";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['password_hash' => $password_hash, 'email' => $email]);
-    }
+public static function updatePassword($userId, $password_hash)
+{
+    $pdo = Database::getConnection();
+    // MUDANÇA AQUI: Usando 'id = :id' no WHERE
+    $sql = "UPDATE users SET password_hash = :password_hash WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    
+    // MUDANÇA AQUI: Passando o ID do usuário
+    $stmt->execute(['password_hash' => $password_hash, 'id' => $userId]);
+    
+    return $stmt->rowCount() > 0;
+}
 
     public static function deleteResetToken($token)
     {

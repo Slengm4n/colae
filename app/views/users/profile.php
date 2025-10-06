@@ -77,7 +77,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                            <a href="http://localhost/colae/dashboard/perfil/seguranca" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                                 <i class="fas fa-shield-alt w-5 text-center"></i>
                                 <span>Segurança</span>
                             </a>

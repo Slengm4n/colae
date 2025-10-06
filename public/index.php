@@ -46,7 +46,8 @@ $router->post('/dashboard/cpf', [UserController::class, 'storeCpf']);
 $router->get('/dashboard/perfil', [UserController::class, 'profile']);
 // ROTA CORRIGIDA PARA CORRESPONDER AO FORMULÁRIO:
 $router->post('/dashboard/perfil/atualizar', [UserController::class, 'updateProfile']);
-
+$router->get('/dashboard/perfil/seguranca', [UserController::class, 'showSecurityPage']);
+$router->post('/dashboard/perfil/seguranca/atualizar', [UserController::class, 'updatePasswordFromProfile']);
 
 // --- ROTAS DE QUADRAS (VENUES) ---
 $router->get('/quadras', [VenueController::class, 'index']);
