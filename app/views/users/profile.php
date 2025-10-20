@@ -34,7 +34,6 @@
 
             <nav class="hidden md:flex items-center space-x-8">
                 <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-gray-300 hover:text-cyan-400 transition-colors">Meu Painel</a>
-                <a href="<?php echo BASE_URL; ?>/quadras" class="font-semibold text-gray-300 hover:text-cyan-400 transition-colors">Meus Locais</a>
             </nav>
 
             <div class="relative">
@@ -49,9 +48,6 @@
                         <a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="text-sm text-gray-400 hover:text-cyan-400">Ver perfil</a>
                     </div>
                     <ul class="py-2">
-                        <li class="md:hidden"><a href="<?php echo BASE_URL; ?>/quadras" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-store w-5 text-center text-gray-400"></i> Meus Locais</a></li>
-                        <li class="border-t border-gray-700 my-2 md:hidden"></li>
-
                         <li><a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
                         <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Ajuda</a></li>
                         <li class="border-t border-gray-700 my-2"></li>
@@ -80,12 +76,6 @@
                             <a href="http://localhost/colae/dashboard/perfil/seguranca" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                                 <i class="fas fa-shield-alt w-5 text-center"></i>
                                 <span>Segurança</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
-                                <i class="fas fa-bell w-5 text-center"></i>
-                                <span>Notificações</span>
                             </a>
                         </li>
                     </ul>
@@ -136,7 +126,8 @@
                                     <div>
                                         <label for="birthdate" class="block text-sm font-medium text-gray-300">Data de Nascimento</label>
                                         <div class="mt-1">
-                                            <input id="birthdate" name="birthdate" type="date" value="<?php echo htmlspecialchars($user['birthdate'] ?? ''); ?>" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm text-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                                            <input id="birthdate" name="birthdate" type="date" value="<?php echo htmlspecialchars($user['birthdate'] ?? ''); ?>" disabled class="w-full bg-gray-900 border border-gray-700 rounded-md px-4 py-3 text-sm text-gray-400 cursor-not-allowed">
+                                            <p class="text-xs text-gray-500 mt-1">A data de nascimento não pode ser alterada.</p>
                                         </div>
                                     </div>
                                 </div>

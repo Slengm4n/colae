@@ -23,9 +23,9 @@
 </head>
 
 <body class="bg-[#0D1117] text-gray-200">
-    
+
     <?php
-    // PARTE 1: A "PONTE" PHP -> JAVASCRIPT (JÁ ESTAVA CORRETA)
+    // PARTE 1: A "PONTE" PHP -> JAVASCRIPT
     if (isset($_SESSION['flash_message']) && $_SESSION['flash_message']['type'] === 'success_with_password') {
         $password = json_encode($_SESSION['flash_message']['password']);
         echo "<script>
@@ -38,12 +38,17 @@
     ?>
 
     <div>
+        <!-- Sidebar (Menu Principal) -->
         <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-[#161B22] border-r border-gray-800 flex flex-col transition-transform -translate-x-full md:translate-x-0">
+            <!-- Botão de Fechar para Mobile -->
+            <button id="sidebar-close-btn" class="md:hidden absolute top-4 right-4 text-gray-500 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
             <div class="p-6 text-center border-b border-gray-800">
                 <div class="w-24 h-24 rounded-full bg-gray-700 mx-auto flex items-center justify-center mb-4">
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
-                <h2 class="text-xl font-bold"><?php echo htmlspecialchars($_SESSION['user_name']); ?></h2>
+                <h2 class="text-xl font-bold"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
@@ -66,50 +71,68 @@
                 </a>
             </div>
         </aside>
+        
+        <!-- Overlay para fechar o menu em mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
 
+        <!-- Conteúdo Principal -->
         <main class="md:ml-64 flex-1 p-6 sm:p-10">
+            <!-- Botão Hamburger para Mobile -->
+            <button id="sidebar-toggle" class="md:hidden mb-6 text-gray-400 hover:text-white">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
                 <h1 class="text-3xl font-bold mb-4 sm:mb-0">Gerenciar Usuários</h1>
                 <a href="http://localhost/colae/admin/usuarios/criar" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors">
                     <i class="fas fa-plus mr-2"></i>Novo Usuário
                 </a>
             </div>
-            <div class="bg-[#161B22] p-6 rounded-2xl border border-gray-800">
+            
+            <!-- Tabela de Usuários Responsiva -->
+            <div class="bg-[#161B22] rounded-2xl border border-gray-800 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-700">
                         <thead>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">#</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">#</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nome</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Data Criada</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Cargo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ação</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Data Criada</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Cargo</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
                             <?php if (isset($users) && count($users) > 0): ?>
                                 <?php foreach ($users as $user): ?>
-                                    <tr class="hover:bg-gray-800/50">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-400"><?php echo htmlspecialchars($user['id']); ?></td>
+                                    <tr class="hover:bg-gray-800/50 transition-colors">
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-400"><?php echo htmlspecialchars($user['id']); ?></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white"><?php echo htmlspecialchars($user['name']); ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo date('d/m/Y', strtotime($user['created_at'])); ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 capitalize"><?php echo htmlspecialchars($user['role']); ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo date('d/m/Y', strtotime($user['created_at'])); ?></td>
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400 capitalize"><?php echo htmlspecialchars($user['role']); ?></td>
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full <?php echo $user['status'] === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'; ?>">
                                                 <span class="w-2 h-2 mr-2 rounded-full <?php echo $user['status'] === 'active' ? 'bg-green-400' : 'bg-red-400'; ?>"></span>
                                                 <?php echo $user['status'] === 'active' ? 'Ativo' : 'Inativo'; ?>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="<?php echo BASE_URL; ?>/admin/usuarios/editar/<?php echo $user['id']; ?>" class="text-cyan-400 hover:text-cyan-300">Editar</a>
-                                            <a href="<?php echo BASE_URL; ?>/admin/usuarios/excluir/<?php echo $user['id']; ?>" class="text-red-400 hover:text-red-300 ml-4" onclick="return confirm('Tem certeza?')">Excluir</a>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="<?php echo BASE_URL; ?>/admin/usuarios/editar/<?php echo $user['id']; ?>" class="text-cyan-400 hover:text-cyan-300 transition-colors" title="Editar">
+                                                <i class="fas fa-pencil-alt"></i> <span class="hidden sm:inline">Editar</span>
+                                            </a>
+                                            <a href="<?php echo BASE_URL; ?>/admin/usuarios/excluir/<?php echo $user['id']; ?>" class="text-red-400 hover:text-red-300 ml-4 transition-colors" onclick="return confirm('Tem certeza que deseja excluir este usuário?')" title="Excluir">
+                                                <i class="fas fa-trash-alt"></i> <span class="hidden sm:inline">Excluir</span>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">Nenhum usuário encontrado.</td>
+                                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                        <i class="fas fa-user-slash text-3xl mb-2"></i>
+                                        <p>Nenhum usuário encontrado.</p>
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -119,6 +142,7 @@
         </main>
     </div>
     
+    <!-- Modal de Senha -->
     <div id="password-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 hidden">
         <div class="bg-[#161B22] border border-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md m-4">
             
@@ -158,6 +182,7 @@
     </div>
 
     <script>
+        // Modal Script
         const modal = document.getElementById('password-modal');
         const passwordDisplay = document.getElementById('modal-password-display');
         const copyBtn = document.getElementById('copy-password-btn');
@@ -207,6 +232,29 @@
         });
 
         closeBtn.addEventListener('click', closeModal);
+
+        // Sidebar Script
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        if (toggleBtn && sidebarCloseBtn && overlay) {
+            toggleBtn.addEventListener('click', openSidebar);
+            sidebarCloseBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+        }
     </script>
 </body>
 </html>
+

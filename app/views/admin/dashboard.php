@@ -41,7 +41,7 @@
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
                 <h2 class="text-xl font-bold">
-                    <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                    <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?>
                 </h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
@@ -111,19 +111,24 @@
                         <thead class="">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nome</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Função</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <!-- Colunas que desaparecem em telas pequenas -->
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
+                                <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
                             <?php if (!empty($data['recentUsers'])): ?>
                                 <?php foreach ($data['recentUsers'] as $user): ?>
                                     <tr>
+                                        <!-- Coluna Nome (Sempre visível) -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white"><?php echo htmlspecialchars($user['name']); ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <!-- Coluna Função/Cargo (Sempre visível) -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['role']); ?></td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <!-- Coluna Email (Oculta em mobile) -->
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <!-- Coluna Status (Oculta em mobile) -->
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $user['status'] === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'; ?>">
                                                 <?php echo htmlspecialchars($user['status']); ?>
                                             </span>
@@ -132,7 +137,7 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhum usuário recente encontrado.</td>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">Nenhum usuário recente encontrado.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

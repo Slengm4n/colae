@@ -38,7 +38,6 @@
 
             <nav class="hidden md:flex items-center space-x-8">
                 <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-cyan-400 transition-colors">Meu Painel</a>
-                <a href="<?php echo BASE_URL; ?>/quadras" class="font-semibold text-gray-300 hover:text-cyan-400 transition-colors">Meus Locais</a>
             </nav>
 
             <div class="relative">
@@ -53,10 +52,7 @@
                         <p class="text-sm text-gray-400">Ver perfil</p>
                     </div>
                     <ul class="py-2">
-                        <li class="md:hidden"><a href="<?php echo BASE_URL; ?>/quadras" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-store w-5 text-center text-gray-400"></i> Meus Locais</a></li>
-                        <li class="border-t border-gray-700 my-2 md:hidden"></li>
-
-                        <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
+                        <li><a href="http://localhost/colae/dashboard/perfil" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
                         <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Ajuda</a></li>
                         <li class="border-t border-gray-700 my-2"></li>
                         <li><a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-5 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i>Sair</a></li>
@@ -99,13 +95,6 @@
         <!-- Seção de Ações Rápidas -->
         <section class="mb-12">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="<?php echo BASE_URL; ?>/quadras" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="bg-cyan-500/10 p-4 rounded-xl"><i class="fas fa-store text-3xl text-cyan-400"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Meus Locais</h3>
-                        <p class="text-sm text-gray-400">Veja e edite suas quadras cadastradas.</p>
-                    </div>
-                </a>
                 <a href="<?php echo BASE_URL; ?>/quadras/criar" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-green-400 transition-all duration-300 transform hover:-translate-y-1">
                     <div class="bg-green-500/10 p-4 rounded-xl"><i class="fas fa-plus-circle text-3xl text-green-400"></i></div>
                     <div>

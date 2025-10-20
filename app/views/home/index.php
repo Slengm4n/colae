@@ -77,13 +77,10 @@
                 <div id="profile-dropdown" class="absolute top-full right-0 mt-4 w-72 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible transform -translate-y-2 transition-all duration-300">
                     <ul class="py-2">
                         <!-- Links de Navegação para Mobile -->
-                        <li class="md:hidden"><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-search w-5 text-center text-gray-400"></i> Encontrar</a></li>
                         <li class="md:hidden"><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-info-circle w-5 text-center text-gray-400"></i> Sobre Nós</a></li>
                         <li class="border-t border-gray-700 my-2 md:hidden"></li>
 
                         <!-- Links Padrão -->
-                        <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Central de Ajuda</a></li>
-                        <li class="border-t border-gray-700 my-2"></li>
                         <li><a href="http://localhost/colae/login" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center text-gray-400"></i>Entrar ou Cadastre-se</a></li>
                     </ul>
                 </div>
@@ -181,13 +178,13 @@
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png" alt="Logo Nike" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leoes_de_ferraz.png" alt="Logo Loes de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leos_de_ferraz.png" alt="Logo Loes de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_fatec.png" alt="Logo Fatec" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Original_Adidas_logo.svg/1280px-Original_Adidas_logo.svg.png" alt="Logo Adidas" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png" alt="Logo Nike" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leoes_de_ferraz.png" alt="Logo Leos de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leos_de_ferraz.png" alt="Logo Leos de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                 </div>
             </div>
         </section>

@@ -20,7 +20,7 @@ class User
         if (!extension_loaded('openssl')) {
             return false;
         }
-        $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
+        $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0,(ENCRYPTION_IV));
 
         if ($encrypted === false) {
 
@@ -38,8 +38,7 @@ class User
         if (!extension_loaded('openssl')) {
             return false; // Retorna false em caso de falha
         }
-
-        $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, hex2bin(ENCRYPTION_IV));
+    $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0,(ENCRYPTION_IV));
 
         if ($decrypted === false) {
             return false; // Retorna false em caso de falha

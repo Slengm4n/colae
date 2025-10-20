@@ -27,7 +27,6 @@
             <a href="<?php echo BASE_URL; ?>/" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
             <nav class="hidden md:flex items-center space-x-8">
                 <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-gray-300 hover:text-cyan-400">Meu Painel</a>
-                <a href="<?php echo BASE_URL; ?>/quadras" class="font-semibold text-gray-300 hover:text-cyan-400">Meus Locais</a>
             </nav>
             <div class="relative">
                 <div id="user-menu-button" class="flex items-center gap-3 p-2 border border-gray-700 rounded-full cursor-pointer hover:bg-gray-700/50">
@@ -57,12 +56,6 @@
                             <a href="<?php echo BASE_URL; ?>/dashboard/seguranca" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold bg-cyan-500/10 text-cyan-400 rounded-lg">
                                 <i class="fas fa-shield-alt w-5 text-center"></i>
                                 <span>Segurança</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
-                                <i class="fas fa-bell w-5 text-center"></i>
-                                <span>Notificações</span>
                             </a>
                         </li>
                     </ul>
