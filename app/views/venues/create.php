@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,34 +11,66 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
-        .step { display: none; }
-        .step.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body class="bg-[#0D1117] text-gray-200">
 
     <div class="flex flex-col h-screen">
         <!-- Cabeçalho -->
         <header class="py-4 px-8 flex justify-between items-center border-b border-gray-800">
             <a href="<?php echo BASE_URL; ?>/dashboard" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
-            <a href="<?php echo BASE_URL; ?>/quadras" class="text-sm font-semibold bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-full transition-colors">Salvar e Sair</a>
+            <a href="<?php echo BASE_URL; ?>/dashboard" class="text-sm font-semibold bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-full transition-colors">Salvar e Sair</a>
         </header>
 
         <!-- Conteúdo Principal -->
         <main class="flex-grow flex items-center justify-center">
             <form id="venue-form" action="<?php echo BASE_URL; ?>/quadras/salvar" method="POST" enctype="multipart/form-data" class="w-full h-full flex flex-col">
-                
+
                 <!-- Etapa 1: Tipo de Piso -->
                 <div id="step-1" class="step active w-full max-w-2xl mx-auto p-8">
                     <h2 class="text-4xl font-bold text-white mb-8">Qual o tipo de piso principal do seu local?</h2>
                     <div class="space-y-4" data-input-name="floor_type">
-                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama sintética"><h3 class="font-semibold text-lg">Grama Sintética</h3></div>
-                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="cimento"><h3 class="font-semibold text-lg">Cimento / Poliesportivo</h3></div>
-                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="areia"><h3 class="font-semibold text-lg">Areia</h3></div>
-                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="saibro"><h3 class="font-semibold text-lg">Saibro</h3></div>
-                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama natural"><h3 class="font-semibold text-lg">Grama Natural</h3></div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama sintética">
+                            <h3 class="font-semibold text-lg">Grama Sintética</h3>
+                        </div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="cimento">
+                            <h3 class="font-semibold text-lg">Cimento / Poliesportivo</h3>
+                        </div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="areia">
+                            <h3 class="font-semibold text-lg">Areia</h3>
+                        </div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="saibro">
+                            <h3 class="font-semibold text-lg">Saibro</h3>
+                        </div>
+                        <div class="option-card border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-cyan-400 transition-colors" data-value="grama natural">
+                            <h3 class="font-semibold text-lg">Grama Natural</h3>
+                        </div>
                     </div>
                 </div>
 
@@ -59,44 +92,44 @@
 
                 <!-- Etapa 3: Comodidades (Checkboxes) -->
                 <div id="step-3" class="step w-full max-w-3xl mx-auto p-8">
-                     <h2 class="text-4xl font-bold text-white mb-8">Informe aos jogadores o que seu espaço tem a oferecer</h2>
-                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <h2 class="text-4xl font-bold text-white mb-8">Informe aos jogadores o que seu espaço tem a oferecer</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="has_lighting" value="1" class="hidden">
                             <i class="fas fa-lightbulb text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Iluminação</span>
                         </label>
-                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="is_covered" value="1" class="hidden">
                             <i class="fas fa-cloud-sun text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Quadra Coberta</span>
                         </label>
-                         <label id="leisure-area-checkbox-card" class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label id="leisure-area-checkbox-card" class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="has_leisure_area" value="1" class="hidden">
                             <i class="fas fa-utensils text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Área de Lazer</span>
                         </label>
-                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="has_wifi" value="1" class="hidden">
                             <i class="fas fa-wifi text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Wi-fi</span>
                         </label>
-                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="has_parking" value="1" class="hidden">
                             <i class="fas fa-parking text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Estacionamento</span>
                         </label>
-                         <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
+                        <label class="checkbox-card border border-gray-700 rounded-lg p-4 flex flex-col items-start justify-start space-y-2 cursor-pointer hover:border-cyan-400 transition-colors">
                             <input type="checkbox" name="has_locker_room" value="1" class="hidden">
                             <i class="fas fa-shower text-2xl text-gray-400 mb-2"></i>
                             <span class="font-semibold text-base">Vestiário</span>
                         </label>
-                     </div>
-                     <!-- Contador de capacidade da área de lazer (inicialmente oculto) -->
+                    </div>
+                    <!-- Contador de capacidade da área de lazer (inicialmente oculto) -->
                     <div id="leisure-capacity-container" class="hidden mt-8 animate-fadeIn">
                         <hr class="border-gray-800 mb-8">
                         <h3 class="text-2xl font-bold text-white mb-4">Qual a capacidade da sua área de lazer?</h3>
-                         <div class="flex justify-between items-center max-w-xs">
+                        <div class="flex justify-between items-center max-w-xs">
                             <label class="font-semibold text-lg">Pessoas</label>
                             <div class="counter-input flex items-center gap-4" data-input-name="leisure_area_capacity" data-min-value="0">
                                 <button type="button" class="counter-btn minus w-10 h-10 rounded-full border border-gray-600 text-gray-400 hover:bg-gray-700">-</button>
@@ -124,29 +157,32 @@
 
                 <!-- Etapa 5: Endereço -->
                 <div id="step-5" class="step w-full max-w-2xl mx-auto p-8">
-                     <h2 class="text-4xl font-bold text-white mb-8">Onde fica o seu local?</h2>
-                     <div class="space-y-4">
-                         <div>
+                    <h2 class="text-4xl font-bold text-white mb-8">Onde fica o seu local?</h2>
+                    <div class="space-y-4">
+                        <div>
                             <label for="cep" class="block text-gray-400 text-sm font-bold mb-2">CEP</label>
                             <input type="text" id="cep" name="cep" required placeholder="00000-000" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500">
-                         </div>
-                         <div class="grid grid-cols-3 gap-4">
-                             <div class="col-span-2"><label for="street" class="block text-gray-400 text-sm font-bold mb-2">Rua</label><input type="text" id="street" name="street" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2"><label for="street" class="block text-gray-400 text-sm font-bold mb-2">Rua</label><input type="text" id="street" name="street" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
                             <div><label for="number" class="block text-gray-400 text-sm font-bold mb-2">Número</label><input type="text" id="number" name="number" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
-                         </div>
-                         <div><label for="neighborhood" class="block text-gray-400 text-sm font-bold mb-2">Bairro</label><input type="text" id="neighborhood" name="neighborhood" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
-                          <div class="grid grid-cols-3 gap-4">
-                             <div class="col-span-2"><label for="city" class="block text-gray-400 text-sm font-bold mb-2">Cidade</label><input type="text" id="city" name="city" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                        </div>
+                        <div><label for="neighborhood" class="block text-gray-400 text-sm font-bold mb-2">Bairro</label><input type="text" id="neighborhood" name="neighborhood" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2"><label for="city" class="block text-gray-400 text-sm font-bold mb-2">Cidade</label><input type="text" id="city" name="city" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
                             <div><label for="state" class="block text-gray-400 text-sm font-bold mb-2">Estado</label><input type="text" id="state" name="state" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500"></div>
-                         </div>
-                     </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Etapa 6: Upload de Fotos -->
                 <div id="step-6" class="step w-full max-w-2xl mx-auto p-8">
                     <h2 class="text-4xl font-bold text-white mb-8">Faça seu local se destacar com fotos</h2>
                     <div id="drop-area" class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-cyan-400 transition-colors">
-                        <label for="images" class="cursor-pointer"><i class="fas fa-cloud-upload-alt text-5xl text-gray-500"></i><p class="mt-4 font-semibold">Arraste e solte suas fotos aqui</p><p class="text-sm text-gray-500">ou clique para selecionar</p><input type="file" id="images" name="images[]" multiple accept="image/jpeg, image/png" class="hidden"></label>
+                        <label for="images" class="cursor-pointer"><i class="fas fa-cloud-upload-alt text-5xl text-gray-500"></i>
+                            <p class="mt-4 font-semibold">Arraste e solte suas fotos aqui</p>
+                            <p class="text-sm text-gray-500">ou clique para selecionar</p><input type="file" id="images" name="images[]" multiple accept="image/jpeg, image/png" class="hidden">
+                        </label>
                     </div>
                     <div id="preview-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                 </div>
@@ -167,9 +203,9 @@
             </div>
         </footer>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('venue-form');
             const steps = Array.from(document.querySelectorAll('.step'));
             const prevBtn = document.getElementById('prev-btn');
@@ -243,7 +279,7 @@
                     card.classList.toggle('border-cyan-400', checkbox.checked);
                     card.classList.toggle('bg-cyan-500/10', checkbox.checked);
                     card.querySelector('i').classList.toggle('text-cyan-400', checkbox.checked);
-                    
+
                     if (card.id === 'leisure-area-checkbox-card') {
                         document.getElementById('leisure-capacity-container').classList.toggle('hidden', !checkbox.checked);
                         if (!checkbox.checked) {
@@ -268,7 +304,9 @@
                             document.getElementById('state').value = data.uf;
                             document.getElementById('number').focus();
                         }
-                    } catch (error) { console.error('Erro ao buscar CEP:', error); }
+                    } catch (error) {
+                        console.error('Erro ao buscar CEP:', error);
+                    }
                 }
             });
 
@@ -276,7 +314,10 @@
             const fileInput = document.getElementById('images');
             const previewContainer = document.getElementById('preview-container');
 
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dropArea.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }));
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dropArea.addEventListener(eName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }));
             ['dragenter', 'dragover'].forEach(eName => dropArea.addEventListener(eName, () => dropArea.classList.add('border-cyan-400', 'bg-gray-800/50')));
             ['dragleave', 'drop'].forEach(eName => dropArea.addEventListener(eName, () => dropArea.classList.remove('border-cyan-400', 'bg-gray-800/50')));
 
@@ -300,5 +341,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>

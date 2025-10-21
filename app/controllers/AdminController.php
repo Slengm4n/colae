@@ -1,71 +1,66 @@
 <?php
 
-require_once __DIR__ . '/../core/AuthHelper.php';
-require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../models/Sport.php';
-require_once __DIR__ . '/../models/Venue.php';
+namespace App\Controllers;
+
+// Importa as classes necessárias que serão utilizadas no controller.
+use App\Core\AuthHelper;
+use App\Core\View;
+use App\Core\ViewHelper;
+use App\Models\User;
+use App\Models\Sport;
+use App\Models\Venue;
+use Exception;
 
 class AdminController
 {
-
-    //Função index do dashboard
+    /*** Exibe o dashboard principal do administrador com estatísticas e dados recentes.*/
     public function dashboard()
     {
-        // Usa o AuthHelper para que só usuários com role admin possa logar e acessar a página
+        // Garante que apenas administradores possam acessar esta página.
         AuthHelper::checkAdmin();
+
         try {
-            // Garante que a sessão foi iniciada
-            $userName = $_SESSION['user_name'] ?? 'Admin';
-
-            // Busque os totais usando a contagem dos arrays do métodos de cada Model
-            $totalUsers = count(User::getAll());
-            $totalSports = count(Sport::getAll());
-            $totalLocations = count(Venue::getAll());
-
-            // Pegando apenas os 5 usuários mais recentes para a tabela
-            $allUsers = User::getAll();
-            $recentUsers = array_slice($allUsers, 0, 5);
-
-
-            // Monte o array $data com as chaves que a view no Canvas espera
+            // Prepara os dados que serão enviados para a view.
             $data = [
-                'userName' => $userName,
-                'totalUsers' => $totalUsers,
-                'totalSports' => $totalSports,
-                'totalLocations' => $totalLocations,
-                'recentUsers' => $recentUsers
+                'userName' => $_SESSION['user_name'] ?? 'Admin',
+                // Busca os totais diretamente do banco para mais eficiência.
+                'totalUsers' => User::countAll(),
+                'totalSports' => Sport::countAll(),
+                'totalLocations' => Venue::countAll(),
+                // Busca apenas os 5 usuários mais recentes.
+                'recentUsers' => User::getRecent(5)
             ];
 
-
-            //Renderiza a view de dashboard de Admin
-            require __DIR__ . '/../views/admin/dashboard.php';
+            // Renderiza a view do dashboard, passando os dados para ela.
+            ViewHelper::render('admin/dashboard', $data);
         } catch (Exception $e) {
+            // Em caso de erro, exibe uma mensagem. O ideal em produção seria logar o erro.
+            // Por exemplo: error_log($e->getMessage());
             echo "Erro ao carregar o dashboard: " . $e->getMessage();
         }
     }
 
-
-    //Função para o mapa de quadras
+    /*** Exibe o mapa com a localização de todas as quadras.*/
     public function showMap()
     {
-        // Usa o AuthHelper para que só usuários com role admin possa acessar a página
+        // Garante que apenas administradores possam acessar esta página.
         AuthHelper::checkAdmin();
 
         try {
-            // Garante que o usuário esteja logado
-            $userName = $_SESSION['user_name'] ?? 'Admin';
-
-            // Busca todas as quadras com coordenadas do Model Venue
+            // Busca todas as quadras que possuem coordenadas geográficas.
             $venuesWithCoords = Venue::getAllWithCoordinates();
 
-            // Prepara os dados para a view
+            // Prepara os dados para a view.
             $data = [
-                'userName' => $userName
+                'userName' => $_SESSION['user_name'] ?? 'Admin',
+                // Converte os dados das quadras para JSON para ser usado pelo JavaScript no mapa.
+                'venuesJson' => json_encode($venuesWithCoords)
             ];
 
-            // Renderiza a view do mapa
-            require __DIR__ . '/../views/admin/map.php';
+            // Renderiza a view do mapa, passando os dados para ela.
+            ViewHelper::render('admin/map', $data);
         } catch (Exception $e) {
+            // Em caso de erro, exibe uma mensagem.
             echo "Erro ao carregar o mapa: " . $e->getMessage();
         }
     }

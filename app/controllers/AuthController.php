@@ -1,65 +1,55 @@
 <?php
 
-require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../core/AuthHelper.php';
+namespace App\Controllers;
+
+use App\Core\ViewHelper;
+use App\Models\User;
+use DateTime;
+use Exception;
 
 class AuthController
 {
-    
-    // Index para o formulário de login.
+    /*** Exibe o formulário de login.*/
     public function index()
     {
-        // Renderiza a pagina de login
-        require_once BASE_PATH . '/app/views/auth/login.php'; 
+        // Renderiza a view usando a classe auxiliar
+        ViewHelper::render('auth/login');
     }
 
-    // Processa a tentativa de login do usuário
+    /*** Processa a tentativa de login.*/
     public function authenticate()
     {
-        // Verifica se os dados do form foram enviados via POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-            // 1. Encontra o usuário pelo email pelo método do Model de User
             $user = User::findByEmail($email);
 
-            // 2. Verifica se o usuário existe e se a senha está correta
             if ($user && password_verify($password, $user['password_hash'])) {
-
-            // 3. Login bem-sucedido: Inicia a sessão e guarda os dados do usuário
-                session_start();
+                // Inicia a sessão e armazena os dados
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-            // OBS: Guarda o role para redireciona-lo para o caminho de dashboard correto (admin ou user)
                 $_SESSION['user_role'] = $user['role'];
 
-            //  Redireciona para o dashboard correto
-                if ($user['role'] === 'admin') {
-            // Se for admin, vai para o dashboard do admin
-                    header('Location: ' . BASE_URL . '/admin');
-                } else {
-            // Se for um usuário comum, vai para o dashboard do usuário
-                    header('Location: ' . BASE_URL . '/dashboard');
-                }
+                // Redireciona com base na role
+                $redirect_to = ($user['role'] === 'admin') ? '/admin' : '/dashboard';
+                header('Location: ' . BASE_URL . $redirect_to);
                 exit;
             } else {
-            // 5. Falha no login: Redireciona de volta para a página de login com uma mensagem de erro
+                // Falha no login
                 header('Location: ' . BASE_URL . '/login?error=credentials');
                 exit;
             }
         }
     }
 
-
-    // Index para o formulário de login.
+    /*** Exibe o formulário de registro.*/
     public function register()
     {
-       //Renderiza a pagina de cadastro 
-        require_once BASE_PATH . '/app/views/auth/register.php';
+        ViewHelper::render('auth/register');
     }
 
-    //Função que prepara os dados para envia-lo ao Model para realizar a query
+    /*** Processa o registro de um novo usuário.*/
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -69,20 +59,24 @@ class AuthController
             $password = $_POST['password'];
             $password_confirmation = $_POST['password_confirmation'];
 
-            // Validação simples de senha, apenas se as duas se condizem
+            // --- VALIDAÇÃO ---
             if ($password !== $password_confirmation) {
-                echo "As senhas precisam ser iguais.";
                 header('Location: ' . BASE_URL . '/register?error=password_mismatch');
                 exit;
             }
+            if (!$this->isOver18($birthdate)) {
+                header('Location: ' . BASE_URL . '/register?error=underage');
+                exit;
+            }
+            if (User::findByEmail($email)) {
+                header('Location: ' . BASE_URL . '/register?error=email_exists');
+                exit;
+            }
 
-            //Faz a hash da senha para poder realizar a query
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $default_role = 'user';
 
-            //Metodo de criação com as variaveis já preparadas passando para a função do Model User
-            if (User::create($name, $email, $birthdate, $password_hash)) {
-
-            // Redireciona para o login após o registo bem-sucedido
+            if (User::create($name, $email, $birthdate, $password_hash, $default_role)) {
                 header('Location: ' . BASE_URL . '/login?status=registered');
                 exit;
             } else {
@@ -92,163 +86,30 @@ class AuthController
         }
     }
 
-    //Processa o logout
+    /*** Processa o logout do usuário.*/
     public function logout()
     {
-        session_start();
+        // A sessão já deve ter sido iniciada no index.php
         session_destroy();
-        //Renderiza a pagina de login novamento
         header('Location: ' . BASE_URL . '/login');
         exit;
     }
 
-    //Processa a solicitação de redefinição de senha
-    public function sendResetLink()
-    {
-        //Verfica se os dados passados pelo form são via POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            // Usa o método do Model para fazer um query por email
-            $user = User::findByEmail($email);
-
-            
-            if ($user) {
-                //Cria o token aleatório de 32bytes
-                $token = bin2hex(random_bytes(32));
-                //Cria o formato de expiração
-                $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
-                //Preapara para poder fazer a query no Model User
-                User::savePasswordResetToken($email, $token, $expires_at);
-
-                //Logger para relatar quem solicitou o a redefinição de senha
-                Logger::getInstance()->info('Solicitação de redefinição de senha para usuário', ['user_id' => $user['id'], 'email' => $user['email']]);
-
-                //Enviar para o método de redefinição de senha
-                $this->sendPasswordResetEmail($email, $token);
-            } else {
-                //Logger para relatar que o email solicitado não é cadastrado no sistema
-                Logger::getInstance()->warning('Tentativa de redefinição de senha para e-mail não cadastrado', ['email' => $email, 'ip' => $_SERVER['REMOTE_ADDR']]);
-            }
-
-            $message = "Se uma conta com este e-mail existir, um link de recuperação foi enviado.";
-            $status = "success";
-            //Renderiza a pagina fazendo um retorno
-            require_once BASE_PATH . '/app/views/auth/forgot_password.php';
-        }
-    }
-
-
-     // Mostra o formulário para redefinir a senha, validando o token.
-    public function showResetPasswordForm()
-    {
-        //Pega o token válido passado pelo pelo sendResetLink
-        $token = $_GET['token'] ?? '';
-        //Acha o token válido
-        $reset_data = User::findResetToken($token);
-
-        //Verifica se o link/token já está expirado 
-        if (!$reset_data || strtotime($reset_data['expires_at']) < time()) {
-            $error = "Token inválido ou expirado. Por favor, solicite um novo link de recuperação.";
-            //Renderiza uma pagina de erro
-            require_once BASE_PATH . '/app/views/error.php';
-            return;
-        }
-        //Caso seja feito com sucesso, renderiza a pagina de resetar a senha
-        require_once BASE_PATH . '/app/views/auth/reset_password.php';
-    }
-
     /**
-     * Processa a redefinição da senha.
+     * Verifica se a data de nascimento corresponde a mais de 18 anos.
+     * @param string $birthdate
+     * @return bool
      */
-    public function resetPassword()
-    {
-        //Verifica o token
-        $token = $_POST['token'];
-        //Pega senha
-        $password = $_POST['password'];
-        //Pega a confirmação de senha
-        $password_confirm = $_POST['password_confirm'];
-
-        //Usa o método para achar o Token no Model User
-        $reset_data = User::findResetToken($token);
-
-        //Verifica se o token ainda está válido
-        if (!$reset_data || strtotime($reset_data['expires_at']) < time()) {
-            $error = "Token inválido ou expirado.";
-            require_once BASE_PATH . '/app/views/error.php';
-            return;
-        }
-
-        //Verifica se as senhas se coincidem
-        if (empty($password) || $password !== $password_confirm) {
-            $error = "As senhas não coincidem ou estão em branco.";
-            //Renderiza novamente a pagina
-            require_once BASE_PATH . '/app/views/auth/reset-password.php';
-            return;
-        }
-        
-        //Faz a hash da nova senha para prepara-la para a query
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        //Passa a nova senha para o método de updatePassword do Model User
-        User::updatePassword($reset_data['email'], $password_hash);
-        //Deleta o Token usado após ter sido atualizado com sucesso
-        User::deleteResetToken($token);
-
-        //Renderiza a página de login com status de sucesso
-        header('Location: ' . BASE_URL . '/login?status=password_updated');
-        exit;
-    }
-
-    // Função auxiliar para enviar o e-mail via SMTP
-    private function sendPasswordResetEmail($email, $token)
-    {
-        $mail = new PHPMailer(true);
-        $reset_link = "http://localhost" . BASE_URL . "/reset-password?token=" . $token;
-
-        try {
-            // --- CONFIGURAÇÃO SERVIDOR DO GMAIL ---
-            $mail->isSMTP();
-            $mail->Host = MAIL_HOST;
-            $mail->SMTPAuth = true;
-            $mail->Username = MAIL_USERNAME;
-            $mail->Password = MAIL_PASSWORD;
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port = MAIL_PORT;
-            $mail->CharSet = 'UTF-8';
-
-            // Remetente e Destinatário
-            $mail->setFrom(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
-            $mail->addAddress($email);
-
-            // Conteúdo do E-mail
-            $mail->isHTML(true);
-            $mail->Subject = 'Recuperacao de Senha - Colaê';
-            $mail->Body    = "Olá!<br><br>Você solicitou a redefinição de sua senha. Clique no link abaixo para criar uma nova senha:<br><a href='{$reset_link}'>{$reset_link}</a><br><br>Este link expira em 1 hora.<br><br>Se você não solicitou isso, pode ignorar este e-mail.<br><br>Atenciosamente,<br>Equipe Colaê";
-            $mail->AltBody = "Para redefinir sua senha, copie e cole este link no seu navegador: {$reset_link}";
-
-            $mail->send();
-
-            Logger::getInstance()->info('E-mail de redefinição de senha enviado', ['email' => $email]);
-        } catch (Exception $e) {
-            //Caso haja algum erro de servidor e o email nao consiga ser enviado
-            Logger::getInstance()->error(
-                'Falha ao enviar e-mail de redefinição de senha',
-                ['email' => $email, 'error_message' => $mail->ErrorInfo]
-            );
-        }
-    }
-
-    //Verificação de maioriadade para criação de conta
-    private function isOver18($birthdate)
+    private function isOver18($birthdate): bool
     {
         if (empty($birthdate)) {
             return false;
         }
         try {
-            $nascimento = new DateTime($birthdate);
-            $hoje = new DateTime();
-            $idade = $hoje->diff($nascimento);
-            return $idade->y >= 18;
+            $birthDateObj = new DateTime($birthdate);
+            $today = new DateTime();
+            $age = $today->diff($birthDateObj);
+            return $age->y >= 18;
         } catch (Exception $e) {
             return false;
         }

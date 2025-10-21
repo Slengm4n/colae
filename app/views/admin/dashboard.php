@@ -41,34 +41,34 @@
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
                 <h2 class="text-xl font-bold">
-                    <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?>
+                    <?php echo htmlspecialchars($data['userName'] ?? 'Admin'); ?>
                 </h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
 
             <!-- Navigation -->
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold bg-cyan-500/10 text-cyan-400 rounded-lg">
+                <a href="<?php echo BASE_URL; ?>/admin" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold bg-cyan-500/10 text-cyan-400 rounded-lg">
                     <i class="fas fa-home w-5 text-center"></i>
                     <span>Início</span>
                 </a>
-                <a href="http://localhost/colae/admin/usuarios" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-users w-5 text-center"></i>
                     <span>Usuários</span>
                 </a>
-                <a href="http://localhost/colae/admin/esportes" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                <a href="<?php echo BASE_URL; ?>/admin/esportes" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-running w-5 text-center"></i>
                     <span>Esportes</span>
                 </a>
-                <a href="http://localhost/colae/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                <a href="<?php echo BASE_URL; ?>/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-map-marker-alt w-5 text-center"></i>
-                    <span>Locais</span>
+                    <span>Mapa</span>
                 </a>
             </nav>
 
             <!-- Logout -->
             <div class="p-4 border-t border-gray-800">
-                <a href="http://localhost/colae/logout" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                <a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                     <i class="fas fa-sign-out-alt w-5 text-center"></i>
                     <span>Sair</span>
                 </a>
@@ -112,30 +112,30 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nome</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Função</th>
-                                <!-- Colunas que desaparecem em telas pequenas -->
                                 <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
                                 <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
-                            <?php if (!empty($data['recentUsers'])): ?>
-                                <?php foreach ($data['recentUsers'] as $user): ?>
+                            <?php if (!empty($data['recentUsers'])) : ?>
+                                <?php foreach ($data['recentUsers'] as $user) : ?>
                                     <tr>
-                                        <!-- Coluna Nome (Sempre visível) -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white"><?php echo htmlspecialchars($user['name']); ?></td>
-                                        <!-- Coluna Função/Cargo (Sempre visível) -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['role']); ?></td>
-                                        <!-- Coluna Email (Oculta em mobile) -->
-                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['email']); ?></td>
-                                        <!-- Coluna Status (Oculta em mobile) -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white"><?php echo htmlspecialchars($user['name'] ?? 'N/D'); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['role'] ?? 'N/D'); ?></td>
+                                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400"><?php echo htmlspecialchars($user['email'] ?? 'N/D'); ?></td>
                                         <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
-                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $user['status'] === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'; ?>">
-                                                <?php echo htmlspecialchars($user['status']); ?>
+                                            <?php
+                                            // Define um valor padrão para o status se ele for nulo ou não existir
+                                            $status = $user['status'] ?? 'inactive';
+                                            $statusClass = $status === 'active' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300';
+                                            ?>
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusClass; ?>">
+                                                <?php echo htmlspecialchars($status); ?>
                                             </span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
-                            <?php else: ?>
+                            <?php else : ?>
                                 <tr>
                                     <td colspan="4" class="px-6 py-4 text-center text-gray-500">Nenhum usuário recente encontrado.</td>
                                 </tr>

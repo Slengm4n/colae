@@ -1,6 +1,15 @@
 <?php
-// No início do seu ficheiro, garanta que a sessão está iniciada.
-// session_start(); 
+// Lógica para determinar a mensagem de erro do CPF, se houver, para exibir no popup.
+$cpfError = null;
+if (isset($_GET['error'])) {
+    if ($_GET['error'] === 'cpf_invalid') {
+        $cpfError = 'CPF inválido. Por favor, verifique o número digitado.';
+    } elseif ($_GET['error'] === 'cpf_in_use') {
+        $cpfError = 'Este CPF já está cadastrado em outra conta.';
+    } else {
+        $cpfError = 'Ocorreu um erro ao salvar seu CPF. Tente novamente.';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -9,18 +18,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Dashboard - Kolae</title>
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome (para ícones) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -31,7 +33,7 @@
 
 <body class="bg-[#0D1117] text-gray-200">
 
-    <!-- ==================== CABEÇALHO DO USUÁRIO ==================== -->
+    <!-- ==================== CABEÇALHO DO UTILIZADOR ==================== -->
     <header class="bg-[#161B22] border-b border-gray-800 sticky top-0 z-30 py-4">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <a href="<?php echo BASE_URL; ?>/" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
@@ -48,11 +50,11 @@
 
                 <div id="profile-dropdown" class="absolute top-full right-0 mt-3 w-72 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible transform -translate-y-2 transition-all duration-300">
                     <div class="p-4 border-b border-gray-700">
-                        <p class="font-semibold text-white"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Usuário'); ?></p>
-                        <p class="text-sm text-gray-400">Ver perfil</p>
+                        <p class="font-semibold text-white"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Utilizador'); ?></p>
+                        <a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="text-sm text-gray-400 hover:underline">Ver perfil</a>
                     </div>
                     <ul class="py-2">
-                        <li><a href="http://localhost/colae/dashboard/perfil" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
                         <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Ajuda</a></li>
                         <li class="border-t border-gray-700 my-2"></li>
                         <li><a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-5 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i>Sair</a></li>
@@ -67,16 +69,20 @@
 
         <!-- Notificações -->
         <div class="mb-10 space-y-4">
-            <?php if (empty($_SESSION['user_cpf'])): ?>
+            <!-- ==================== CORREÇÃO AQUI ==================== -->
+            <!-- A verificação agora usa a variável $showCpfModal que vem do Controller -->
+            <?php if (isset($showCpfModal) && $showCpfModal): ?>
                 <div class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-6 py-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
                     <i class="fas fa-exclamation-triangle text-xl flex-shrink-0"></i>
                     <div>
                         <p class="font-semibold">Complete seu perfil para continuar</p>
                         <p class="text-sm">Para cadastrar e gerenciar seus locais, precisamos que valide seu CPF.</p>
                     </div>
+                    <!-- O link continua a ir para a página de CPF, como no seu design original -->
                     <a href="<?php echo BASE_URL; ?>/dashboard/cpf" class="bg-yellow-400 text-black font-bold py-2 px-4 rounded-lg text-sm transition-colors hover:bg-yellow-300 mt-2 sm:mt-0 flex-shrink-0">Adicionar CPF</a>
                 </div>
             <?php endif; ?>
+            <!-- ==================== FIM DA CORREÇÃO ==================== -->
 
             <?php if (isset($_GET['status']) && $_GET['status'] === 'cpf_success'): ?>
                 <div class="bg-green-500/10 border border-green-500/30 text-green-300 px-6 py-4 rounded-lg flex items-center gap-4">
@@ -88,7 +94,7 @@
 
         <!-- Seção de Boas-Vindas -->
         <section class="mb-12">
-            <h1 class="text-4xl font-bold text-white">Bem-vindo(a), <span class="text-cyan-400"><?php echo explode(' ', htmlspecialchars($_SESSION['user_name'] ?? 'Usuário'))[0]; ?>!</span></h1>
+            <h1 class="text-4xl font-bold text-white">Bem-vindo(a), <span class="text-cyan-400"><?php echo explode(' ', htmlspecialchars($userName ?? 'Utilizador'))[0]; ?>!</span></h1>
             <p class="mt-2 text-lg text-gray-400">Gerencie suas informações e locais aqui.</p>
         </section>
 
@@ -102,7 +108,7 @@
                         <p class="text-sm text-gray-400">Adicione uma nova quadra à plataforma.</p>
                     </div>
                 </a>
-                <a href="http://localhost/colae/dashboard/perfil" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-gray-600 transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="bg-[#161B22] p-6 rounded-2xl border border-gray-800 flex items-center gap-6 hover:border-gray-600 transition-all duration-300 transform hover:-translate-y-1">
                     <div class="bg-gray-500/10 p-4 rounded-xl"><i class="fas fa-cog text-3xl text-gray-400"></i></div>
                     <div>
                         <h3 class="font-bold text-lg text-white">Configurações da Conta</h3>
@@ -112,14 +118,12 @@
             </div>
         </section>
 
-        <!-- Seção de Visão Geral de "Meus Locais" (Estilo Airbnb) -->
+        <!-- Seção de Visão Geral de "Meus Locais" -->
         <section>
             <h2 class="text-2xl font-bold mb-6 text-white">Visão Geral dos Seus Locais</h2>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-                <?php if (!empty($data['userVenues'])): ?>
-                    <?php foreach ($data['userVenues'] as $venue): ?>
+                <?php if (!empty($userVenues)): ?>
+                    <?php foreach ($userVenues as $venue): ?>
                         <div class="group">
                             <a href="<?php echo BASE_URL; ?>/quadras/editar/<?php echo $venue['id']; ?>">
                                 <div class="relative overflow-hidden rounded-xl">
@@ -150,14 +154,13 @@
                 <?php endif; ?>
             </div>
         </section>
-
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Lógica do menu dropdown do cabeçalho
             const userMenuButton = document.getElementById('user-menu-button');
             const profileDropdown = document.getElementById('profile-dropdown');
-
             if (userMenuButton) {
                 userMenuButton.addEventListener('click', (event) => {
                     event.stopPropagation();
@@ -166,7 +169,6 @@
                     profileDropdown.classList.toggle('-translate-y-2');
                 });
             }
-
             window.addEventListener('click', (event) => {
                 if (profileDropdown && !profileDropdown.classList.contains('invisible')) {
                     if (!profileDropdown.contains(event.target) && !userMenuButton.contains(event.target)) {

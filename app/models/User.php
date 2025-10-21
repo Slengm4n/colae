@@ -1,55 +1,53 @@
 <?php
 
-require_once __DIR__ . '/../core/Database.php';
+namespace App\Models;
 
+use App\Core\Database;
+use PDO;
+
+/**
+ * Class User
+ * Gerencia todas as operações de banco de dados para a entidade de utilizador.
+ */
 class User
 {
-    //Variaveis publicas para armazenar os dados do usuario
-    public $id;
-    public $name;
-    public $email;
-    public $birthdate;
-    public $role;
-    public $cpf;
+    // --- MÉTODOS DE CONTAGEM E BUSCA RECENTE ---
 
-    // --- Funções de Criptografia ---
-
-    private static function encryptCpf($cpf)
+    public static function countAll(): int
     {
-        // Verifica se a extensão openssl está carregada
-        if (!extension_loaded('openssl')) {
-            return false;
-        }
-        $encrypted = openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0,(ENCRYPTION_IV));
-
-        if ($encrypted === false) {
-
-            return false;
-        }
-        return $encrypted;
+        $pdo = Database::getConnection();
+        $query = "SELECT COUNT(id) FROM users WHERE status = 'active'";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
     }
 
-    private static function decryptCpf($encrypted_cpf)
+    public static function getRecent(int $limit): array
     {
-        if (empty($encrypted_cpf)) {
-            return null;
-        }
-
-        if (!extension_loaded('openssl')) {
-            return false; // Retorna false em caso de falha
-        }
-    $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0,(ENCRYPTION_IV));
-
-        if ($decrypted === false) {
-            return false; // Retorna false em caso de falha
-        }
-        return $decrypted;
+        $pdo = Database::getConnection();
+        $query = "SELECT id, name, email, role, status, created_at 
+                  FROM users 
+                  WHERE status = 'active'
+                  ORDER BY created_at DESC 
+                  LIMIT :limit";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // --- MÉTODOS DE CRUD ---
 
-    // --- Métodos do Usuário (Modificados para Criptografia) ---
+    public static function getAll(): array
+    {
+        $pdo = Database::getConnection();
+        $query = "SELECT * FROM users ORDER BY created_at DESC";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-    public static function findById($id)
+    public static function findById(int $id)
     {
         $pdo = Database::getConnection();
         $query = "SELECT * FROM users WHERE id = :id";
@@ -58,127 +56,13 @@ class User
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Descriptografa o CPF se ele existir
         if ($user && !empty($user['cpf'])) {
             $user['cpf'] = self::decryptCpf($user['cpf']);
         }
-
         return $user;
     }
 
-    public static function updateCpf($userId, $cpf)
-    {
-        $encryptedCpf = self::encryptCpf($cpf);
-        if ($encryptedCpf === false) {
-            // A falha na criptografia já foi logada, retorna false para o controller
-            return false;
-        }
-        $pdo = Database::getConnection();
-        $query = "UPDATE users SET cpf = :cpf WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':cpf', $encryptedCpf);
-        $stmt->bindParam(':id', $userId);
-        return $stmt->execute();
-    }
-
-    public static function isCpfInUse($cpf, $excludeUserId)
-    {
-        $pdo = Database::getConnection();
-        $query = "SELECT id, cpf FROM users WHERE id != :exclude_id AND cpf IS NOT NULL";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':exclude_id', $excludeUserId);
-        $stmt->execute();
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($users as $user) {
-            if (self::decryptCpf($user['cpf']) === $cpf) {
-                return true; // Encontrou um CPF igual
-            }
-        }
-        return false;
-    }
-
-    // --- Métodos Originais (sem alteração) ---
-
-    public static function getAll()
-    {
-        $pdo = Database::getConnection();
-        $query = "SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Em /app/models/User.php
-
-public static function create($name, $email, $birthdate, $password_hash, $role)
-{
-    $pdo = Database::getConnection();
-    $query = "INSERT INTO users (name, email, birthdate, password_hash, role, status, force_password_change) VALUES (:name, :email, :birthdate, :password_hash, :role, 'active', 1)";
-    $stmt = $pdo->prepare($query);
-
-    // CORREÇÃO: Garanta que todas as variáveis aqui começam com $
-    $stmt->bindParam(':name', $name);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':birthdate', $birthdate);
-    $stmt->bindParam(':password_hash', $password_hash);
-    $stmt->bindParam(':role', $role);
-    
-    // A linha 123, que dava o erro, agora deve funcionar
-    return $stmt->execute();
-}
-
-    public function readOne($id)
-    {
-        $pdo = Database::getConnection();
-        $query = "SELECT * FROM users WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($userData) {
-            $this->id = $userData['id'];
-            $this->name = $userData['name'];
-            $this->email = $userData['email'];
-            $this->birthdate = $userData['birthdate'];
-            // O CPF será descriptografado no findById, então não precisamos mexer aqui
-        }
-        return $userData;
-    }
-
-    // Em /app/models/User.php
-
-public function update()
-{
-    $pdo = Database::getConnection();
-    
-    // 1. A query deve incluir o campo 'role'
-    $query = "UPDATE users SET name = :name, email = :email, birthdate = :birthdate, role = :role WHERE id = :id";
-    
-    $stmt = $pdo->prepare($query);
-    
-    // 2. Garanta que todos os 5 placeholders tenham um bindParam correspondente
-    $stmt->bindParam(':id', $this->id);
-    $stmt->bindParam(':name', $this->name);
-    $stmt->bindParam(':email', $this->email);
-    $stmt->bindParam(':birthdate', $this->birthdate);
-    $stmt->bindParam(':role', $this->role); // Esta linha provavelmente estava faltando
-    
-    // A linha 162, que dava o erro, agora deve funcionar
-    return $stmt->execute();
-}
-
-    public static function delete($id)
-    {
-        $pdo = Database::getConnection();
-        $query = "UPDATE users SET status = 'inactive' WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
-    }
-
-    public static function findByEmail($email)
+    public static function findByEmail(string $email)
     {
         $pdo = Database::getConnection();
         $query = "SELECT * FROM users WHERE email = :email AND status = 'active'";
@@ -188,61 +72,35 @@ public function update()
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function savePasswordResetToken($email, $token, $expires_at)
+    public static function create(array $data)
     {
         $pdo = Database::getConnection();
-        $sql = "INSERT INTO password_resets (email, token, expires_at) VALUES (:email, :token, :expires_at)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['email' => $email, 'token' => $token, 'expires_at' => $expires_at]);
-    }
+        $data['status'] = 'active';
+        $data['force_password_change'] = 1;
 
-    public static function findResetToken($token)
-    {
-        $pdo = Database::getConnection();
-        $sql = "SELECT * FROM password_resets WHERE token = :token";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['token' => $token]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+        $query = "INSERT INTO users (name, email, birthdate, password_hash, role, status, force_password_change) 
+                  VALUES (:name, :email, :birthdate, :password_hash, :role, :status, :force_password_change)";
 
-public static function updatePassword($userId, $password_hash)
-{
-    $pdo = Database::getConnection();
-    // MUDANÇA AQUI: Usando 'id = :id' no WHERE
-    $sql = "UPDATE users SET password_hash = :password_hash WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    
-    // MUDANÇA AQUI: Passando o ID do usuário
-    $stmt->execute(['password_hash' => $password_hash, 'id' => $userId]);
-    
-    return $stmt->rowCount() > 0;
-}
-
-    public static function deleteResetToken($token)
-    {
-        $pdo = Database::getConnection();
-        $sql = "DELETE FROM password_resets WHERE token = :token";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['token' => $token]);
-    }
-
-    public static function clearPasswordChangeFlag($userId)
-    {
-        $pdo = Database::getConnection();
-        $query = "UPDATE users SET force_password_change = 0 WHERE id = :id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $userId);
-        return $stmt->execute();
+        return $stmt->execute($data);
     }
 
-    public static function updateFields($id, array $data)
+    public static function update(int $id, array $data): bool
     {
+        if (isset($data['cpf'])) {
+            $encryptedCpf = self::encryptCpf($data['cpf']);
+            if ($encryptedCpf === false) {
+                // Se a encriptação falhar, não continue para não salvar um valor inválido
+                return false;
+            }
+            $data['cpf'] = $encryptedCpf;
+        }
+
         if (empty($data)) {
             return true;
         }
 
         $pdo = Database::getConnection();
-
         $fields = [];
         foreach (array_keys($data) as $key) {
             $fields[] = "$key = :$key";
@@ -250,12 +108,71 @@ public static function updatePassword($userId, $password_hash)
         $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
 
         $stmt = $pdo->prepare($query);
+        $data['id'] = $id;
 
-        foreach ($data as $key => &$value) {
-            $stmt->bindParam(":$key", $value);
+        return $stmt->execute($data);
+    }
+
+    public static function delete(int $id): bool
+    {
+        return self::update($id, ['status' => 'inactive']);
+    }
+
+    // --- MÉTODOS DE CPF ---
+
+    public static function isCpfInUse(string $cpf, int $excludeUserId): bool
+    {
+        $pdo = Database::getConnection();
+        $query = "SELECT id, cpf FROM users WHERE id != :exclude_id AND cpf IS NOT NULL";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':exclude_id', $excludeUserId);
+        $stmt->execute();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($users as $user) {
+            $decryptedCpf = self::decryptCpf($user['cpf']);
+            if ($decryptedCpf === $cpf) {
+                return true;
+            }
         }
-        $stmt->bindParam(':id', $id);
+        return false;
+    }
 
-        return $stmt->execute();
+    // --- MÉTODOS DE SENHA ---
+
+    public static function clearPasswordChangeFlag(int $userId): bool
+    {
+        return self::update($userId, ['force_password_change' => 0]);
+    }
+
+    // --- MÉTODOS DE CRIPTOGRAFIA (COM A CORREÇÃO FINAL) ---
+
+    private static function getIvBinary()
+    {
+        if (!defined('ENCRYPTION_IV') || strlen(ENCRYPTION_IV) !== 32 || !ctype_xdigit(ENCRYPTION_IV)) {
+            // Lançar um erro ou logar, pois o IV não é um hexadecimal de 32 caracteres.
+            error_log("ENCRYPTION_IV não está definida ou não é um hexadecimal de 32 caracteres.");
+            return false;
+        }
+        return hex2bin(ENCRYPTION_IV);
+    }
+
+    private static function encryptCpf(string $cpf)
+    {
+        $iv = self::getIvBinary();
+        if ($iv === false || !extension_loaded('openssl') || !defined('ENCRYPTION_KEY')) {
+            return false;
+        }
+        return openssl_encrypt($cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, $iv);
+    }
+
+    private static function decryptCpf(?string $encrypted_cpf)
+    {
+        $iv = self::getIvBinary();
+        if ($iv === false || empty($encrypted_cpf) || !extension_loaded('openssl') || !defined('ENCRYPTION_KEY')) {
+            return null;
+        }
+        $decrypted = openssl_decrypt($encrypted_cpf, 'aes-256-cbc', ENCRYPTION_KEY, 0, $iv);
+        return $decrypted === false ? null : $decrypted;
     }
 }

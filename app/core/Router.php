@@ -1,36 +1,82 @@
 <?php
 
+namespace App\Core;
+
+/**
+ * Class Router
+ * Um roteador simples que mapeia URLs para controllers e métodos.
+ */
 class Router
 {
     private $routes = [];
+    private $prefix = '';
 
-    public function get($path, $handler)
+    /**
+     * Adiciona uma rota para o método GET.
+     * @param string $path
+     * @param mixed $handler
+     */
+    public function get(string $path, $handler)
     {
         $this->addRoute('GET', $path, $handler);
     }
 
-    public function post($path, $handler)
+    /**
+     * Adiciona uma rota para o método POST.
+     * @param string $path
+     * @param mixed $handler
+     */
+    public function post(string $path, $handler)
     {
         $this->addRoute('POST', $path, $handler);
     }
 
-    private function addRoute($method, $path, $handler)
+    /**
+     * Adiciona uma rota ao array de rotas, considerando o prefixo do grupo.
+     * @param string $method
+     * @param string $path
+     * @param mixed $handler
+     */
+    private function addRoute(string $method, string $path, $handler)
     {
-        $this->routes[strtoupper($method)][$path] = $handler;
+        // Garante que o caminho completo comece com uma barra
+        $fullPath = rtrim($this->prefix, '/') . '/' . ltrim($path, '/');
+        // Garante que a rota final não tenha uma barra no final, a menos que seja a raiz
+        if (strlen($fullPath) > 1) {
+            $fullPath = rtrim($fullPath, '/');
+        }
+
+        $this->routes[strtoupper($method)][$fullPath] = $handler;
     }
 
+    /**
+     * Agrupa rotas sob um prefixo comum.
+     * @param string $prefix
+     * @param callable $callback
+     */
+    public function group(string $prefix, callable $callback)
+    {
+        $previousPrefix = $this->prefix;
+        $this->prefix .= $prefix;
+        call_user_func($callback, $this);
+        $this->prefix = $previousPrefix;
+    }
+
+    /**
+     * Encontra a rota correspondente à requisição atual e a executa.
+     */
     public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        // Remove a pasta base (BASE_URL) da URI da requisição
-        $uri = '/'; // Valor padrão para a raiz
-        if (strpos($requestUri, BASE_URL) === 0) {
+        // Remove a pasta base (BASE_URL) da URI
+        $uri = '/';
+        if (defined('BASE_URL') && strpos($requestUri, BASE_URL) === 0) {
             $uri = substr($requestUri, strlen(BASE_URL));
         }
 
-        // Garante que a URI comece com uma barra e não termine com uma (a menos que seja a raiz)
+        // Normaliza a URI
         if (empty($uri) || $uri[0] !== '/') {
             $uri = '/' . $uri;
         }
@@ -38,36 +84,43 @@ class Router
             $uri = rtrim($uri, '/');
         }
 
+        // Tenta encontrar uma rota estática primeiro
         if (isset($this->routes[$method][$uri])) {
             $this->executeHandler($this->routes[$method][$uri]);
             return;
         }
 
-        // Se não encontrou, procura por rotas com parâmetros dinâmicos (ex: /editar/{id})
-        foreach ($this->routes[$method] as $routePath => $handler) {
-            if (strpos($routePath, '{') !== false) {
-                $pattern = preg_replace('/\\{([a-zA-Z0-9_]+)\\}/', '(?P<$1>[^/]+)', $routePath);
-                $pattern = '#^' . $pattern . '$#';
+        // Procura por rotas com parâmetros dinâmicos
+        if (!empty($this->routes[$method])) {
+            foreach ($this->routes[$method] as $routePath => $handler) {
+                if (strpos($routePath, '{') !== false) {
+                    $pattern = preg_replace('/\\{([a-zA-Z0-9_]+)\\}/', '(?P<$1>[^/]+)', $routePath);
+                    $pattern = '#^' . $pattern . '$#';
 
-                if (preg_match($pattern, $uri, $matches)) {
-                    $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                    $this->executeHandler($handler, $params);
-                    return;
+                    if (preg_match($pattern, $uri, $matches)) {
+                        $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                        $this->executeHandler($handler, $params);
+                        return;
+                    }
                 }
             }
         }
 
-        // Se nada correspondeu, envia o 404
+
         $this->sendNotFound();
     }
 
-    private function executeHandler($handler, $params = [])
+    /**
+     * Executa o handler (controller/método) de uma rota.
+     * @param mixed $handler
+     * @param array $params
+     */
+    private function executeHandler($handler, array $params = [])
     {
-        if (is_callable($handler)) {
-            call_user_func_array($handler, $params);
-        } elseif (is_array($handler) && class_exists($handler[0])) {
+        if (is_array($handler) && isset($handler[0]) && class_exists($handler[0])) {
             $controller = new $handler[0]();
             $methodName = $handler[1];
+
             if (method_exists($controller, $methodName)) {
                 call_user_func_array([$controller, $methodName], $params);
             } else {
@@ -78,9 +131,14 @@ class Router
         }
     }
 
-    private function sendNotFound($message = "Página não encontrada pelo Roteador")
+    /**
+     * Envia uma resposta 404 Not Found.
+     * @param string $message
+     */
+    private function sendNotFound(string $message = "Página não encontrada")
     {
         http_response_code(404);
+        // Pode criar uma view bonita para o 404 aqui
         echo "<h1>404 - {$message}</h1>";
     }
 }

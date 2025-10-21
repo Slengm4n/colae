@@ -1,64 +1,70 @@
 <?php
 
-require_once __DIR__ . '/../core/Database.php';
-require_once __DIR__ . '/../../config.php';
+namespace App\Models;
 
+use App\Core\Database;
+
+use PDO;
+
+/**
+ * Class Address
+ * Gerencia todas as operações de banco de dados para a entidade de endereço,
+ * incluindo a geocodificação para obter coordenadas.
+ */
 class Address
 {
-    public $id;
-    public $cep;
-    public $street;
-    public $number;
-    public $neighborhood;
-    public $complement;
-    public $city;
-    public $state;
-
-    public static function create($cep, $street, $number, $neighborhood, $complement, $city, $state)
+    /**
+     * Cria um novo endereço no banco de dados, buscando as coordenadas geográficas.
+     * @param array $data Dados do endereço.
+     * @return string|false Retorna o ID do novo endereço ou false em caso de falha.
+     */
+    public static function create(array $data)
     {
-        // --- Início da Lógica de Geocodificação ---
-        $apiKey = GOOGLE_MAPS_API_KEY;
-        $fullAddress = urlencode("$street, $number, $neighborhood, $city, $state, $cep");
-        $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$fullAddress}&key={$apiKey}";
-
+        // --- Lógica de Geocodificação ---
         $latitude = null;
         $longitude = null;
 
-        // @ suprime erros caso a URL falhe; verificamos o resultado a seguir
-        $responseJson = @file_get_contents($url);
-        if ($responseJson) {
-            $response = json_decode($responseJson);
-            if ($response && $response->status == 'OK') {
-                $location = $response->results[0]->geometry->location;
-                $latitude = $location->lat;
-                $longitude = $location->lng;
+        if (defined('GOOGLE_MAPS_API_KEY') && GOOGLE_MAPS_API_KEY) {
+            $fullAddress = urlencode(
+                "{$data['street']}, {$data['number']}, {$data['neighborhood']}, {$data['city']}, {$data['state']}, {$data['cep']}"
+            );
+            $url = "https://maps.googleapis.com/maps/api/geocode/json?address={$fullAddress}&key=" . GOOGLE_MAPS_API_KEY;
+
+            $responseJson = @file_get_contents($url);
+            if ($responseJson) {
+                $response = json_decode($responseJson);
+                if ($response && $response->status == 'OK') {
+                    $location = $response->results[0]->geometry->location;
+                    $latitude = $location->lat;
+                    $longitude = $location->lng;
+                }
             }
         }
-        // --- Fim da Lógica de Geocodificação ---
+        // --- Fim da Geocodificação ---
 
         $pdo = Database::getConnection();
-
-        // Adicionamos latitude e longitude à query de inserção
-        $query = "INSERT INTO addresses (cep, street, number, neighborhood, complement, city, state, latitude, longitude) 
-              VALUES (:cep, :street, :number, :neighborhood, :complement, :city, :state, :latitude, :longitude)";
+        $query = "INSERT INTO addresses (cep, street, `number`, neighborhood, complement, city, state, latitude, longitude) 
+                  VALUES (:cep, :street, :number, :neighborhood, :complement, :city, :state, :latitude, :longitude)";
 
         $stmt = $pdo->prepare($query);
 
-        $stmt->bindParam(":cep", $cep);
-        $stmt->bindParam(":street", $street);
-        $stmt->bindParam(":number", $number);
-        $stmt->bindParam(":neighborhood", $neighborhood);
-        $stmt->bindParam(":complement", $complement);
-        $stmt->bindParam(":city", $city);
-        $stmt->bindParam(":state", $state);
-        $stmt->bindParam(":latitude", $latitude);
-        $stmt->bindParam(":longitude", $longitude);
+        // Adiciona as coordenadas ao array de dados para inserção
+        $data['latitude'] = $latitude;
+        $data['longitude'] = $longitude;
 
-        $stmt->execute();
-        return $pdo->lastInsertId();
+        if ($stmt->execute($data)) {
+            return $pdo->lastInsertId();
+        }
+
+        return false;
     }
 
-    public static function readOne($id)
+    /**
+     * Busca um endereço pelo seu ID.
+     * @param int $id
+     * @return mixed
+     */
+    public static function findById(int $id)
     {
         $pdo = Database::getConnection();
         $query = "SELECT * FROM addresses WHERE id = :id";
@@ -69,35 +75,33 @@ class Address
     }
 
     /**
-     * Atualiza um registro de endereço existente no banco de dados.
+     * Atualiza um endereço existente.
+     * @param int $id
+     * @param array $data
+     * @return bool
      */
-    public function update()
+    public static function update(int $id, array $data): bool
     {
-        $pdo = Database::getConnection();
+        if (empty($data)) {
+            return true;
+        }
 
-        // Query corrigida para incluir todos os campos e sem erros de sintaxe
-        $query = "UPDATE addresses SET 
-                    cep = :cep, 
-                    street = :street, 
-                    `number` = :number, 
-                    neighborhood = :neighborhood, 
-                    complement = :complement, 
-                    city = :city, 
-                    state = :state
-                  WHERE id = :id";
+        // Se o endereço for atualizado, podemos recalcular as coordenadas
+        // (Esta parte é opcional, mas recomendada)
+        // Você pode adicionar a lógica de geocodificação aqui também se desejar
+
+        $pdo = Database::getConnection();
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            // A palavra 'number' é reservada, então a escapamos com crases
+            $fieldName = ($key === 'number') ? "`number`" : $key;
+            $fields[] = "$fieldName = :$key";
+        }
+        $query = "UPDATE addresses SET " . implode(', ', $fields) . " WHERE id = :id";
 
         $stmt = $pdo->prepare($query);
+        $data['id'] = $id;
 
-        // Sintaxe do bindParam corrigida
-        $stmt->bindParam(':cep', $this->cep);
-        $stmt->bindParam(':street', $this->street);
-        $stmt->bindParam(':number', $this->number);
-        $stmt->bindParam(':neighborhood', $this->neighborhood);
-        $stmt->bindParam(':complement', $this->complement);
-        $stmt->bindParam(':city', $this->city);
-        $stmt->bindParam(':state', $this->state);
-        $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        return $stmt->execute($data);
     }
 }
