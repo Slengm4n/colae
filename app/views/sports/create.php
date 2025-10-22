@@ -41,10 +41,7 @@
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
                 <h2 class="text-xl font-bold">
-                    <?php
-                    $fullName = htmlspecialchars($_SESSION['user_name'] ?? 'Admin');
-                    echo explode(' ', $fullName)[0];
-                    ?>
+                    <?php echo htmlspecialchars($userName ?? 'Admin'); ?>
                 </h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>

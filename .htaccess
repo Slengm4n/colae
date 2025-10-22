@@ -1,19 +1,21 @@
 <IfModule mod_rewrite.c>
-    # Ativa o motor de reescrita
     RewriteEngine On
 
-    # Define a pasta base do projeto
-    RewriteBase /colae/
-
-    # REGRA 1: Lida com a página principal (com ou sem barra final).
-    # O "?" torna a barra opcional, corrigindo o erro 404 na raiz.
-    RewriteRule ^/?$ public/index.php [L]
-
-    # REGRA 2: Lida com todos os outros pedidos.
-    # Se o ficheiro ou diretório solicitado não existir fisicamente...
+    # --- Bloco de Regra para LOCALHOST ---
+    # Se o Host for "localhost"
+    RewriteCond %{HTTP_HOST} ^localhost$
+    # E o arquivo ou pasta não existir
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+    # Reescreve para /colae/index.php (o caminho do seu XAMPP)
+    RewriteRule . /colae/index.php [L]
 
-    # ...redireciona o pedido para o index.php dentro da pasta public.
-    RewriteRule . public/index.php [L]
+    # --- Bloco de Regra para PRODUÇÃO ---
+    # Se o Host NÃO for "localhost" (ex: colae.42web.io)
+    RewriteCond %{HTTP_HOST} !^localhost$
+    # E o arquivo ou pasta não existir
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Reescreve para /index.php (o caminho da raiz no InfinityFree)
+    RewriteRule . /index.php [L]
 </IfModule>

@@ -41,10 +41,7 @@
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
                 <h2 class="text-xl font-bold">
-                    <?php
-                    $fullName = htmlspecialchars($_SESSION['user_name'] ?? 'Admin');
-                    echo explode(' ', $fullName)[0];
-                    ?>
+                    <?php echo htmlspecialchars($userName ?? 'Admin'); ?>
                 </h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
@@ -65,7 +62,7 @@
                 </a>
                 <a href="<?php echo BASE_URL; ?>/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                     <i class="fas fa-map-marker-alt w-5 text-center"></i>
-                    <span>Locais</span>
+                    <span>Mapa</span>
                 </a>
             </nav>
 

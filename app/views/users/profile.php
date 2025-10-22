@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - Kolae</title>
+    <title>Kolae</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,7 +48,7 @@
                         <a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="text-sm text-gray-400 hover:text-cyan-400">Ver perfil</a>
                     </div>
                     <ul class="py-2">
-                        <li><a href="<?php echo BASE_URL; ?>/dashboard/perfil" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-cog w-5 text-center text-gray-400"></i> Configurações</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>/dashboard" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-home w-5 text-center text-gray-400"></i>Voltar para home</a></li>
                         <li><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-question-circle w-5 text-center text-gray-400"></i> Ajuda</a></li>
                         <li class="border-t border-gray-700 my-2"></li>
                         <li><a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-5 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i>Sair</a></li>
@@ -73,7 +73,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="http://localhost/colae/dashboard/perfil/seguranca" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
+                            <a href="<?php echo BASE_URL; ?>/dashboard/perfil/seguranca" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors">
                                 <i class="fas fa-shield-alt w-5 text-center"></i>
                                 <span>Segurança</span>
                             </a>
@@ -94,7 +94,8 @@
                                     <h2 class="text-2xl font-bold text-white mb-4 w-full text-left lg:hidden">Foto de Perfil</h2>
                                     <?php
                                     $avatarPath = !empty($user['avatar_path'])
-                                        ? BASE_URL . '/public/uploads/avatars/' . $user['avatar_path']
+                                        // Adiciona o ID do usuário ($user['id']) ao caminho:
+                                        ? BASE_URL . '/uploads/avatars/' . $user['id'] . '/' . $user['avatar_path']
                                         : 'https://placehold.co/256x256/1f2937/9ca3af?text=Foto';
                                     ?>
                                     <img id="avatar-preview" src="<?php echo $avatarPath; ?>" alt="Foto do perfil" class="w-48 h-48 object-cover rounded-full border-4 border-gray-700 mb-4">

@@ -65,15 +65,22 @@ class Router
     /**
      * Encontra a rota correspondente à requisição atual e a executa.
      */
+    /**
+     * Encontra a rota correspondente à requisição atual e a executa.
+     */
     public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        // Remove a pasta base (BASE_URL) da URI
+        // Remove a pasta base (BASE_DIR_URL) da URI
         $uri = '/';
-        if (defined('BASE_URL') && strpos($requestUri, BASE_URL) === 0) {
-            $uri = substr($requestUri, strlen(BASE_URL));
+        if (defined('BASE_DIR_URL') && !empty(BASE_DIR_URL) && strpos($requestUri, BASE_DIR_URL) === 0) {
+            // Se rodando no localhost, remove o /colae
+            $uri = substr($requestUri, strlen(BASE_DIR_URL));
+        } else {
+            // Se rodando na produção (ou se BASE_DIR_URL for vazio), a URI é o próprio requestUri
+            $uri = $requestUri;
         }
 
         // Normaliza a URI
@@ -105,7 +112,6 @@ class Router
                 }
             }
         }
-
 
         $this->sendNotFound();
     }

@@ -1,19 +1,7 @@
 <?php
 
-// Inicia a sessão para toda a aplicação.
-session_start();
-
-// --- Constantes Globais ---
-define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/colae'); // Ajuste se o seu projeto estiver noutra pasta
-
-// --- Autoloader do Composer ---
-require_once BASE_PATH . '/vendor/autoload.php';
-
-// --- Configurações Personalizadas ---
-require_once BASE_PATH . '/config.php';
-
 // --- Importação dos Controllers ---
+// TODO O BLOCO DE 'use' DEVE VIR PRIMEIRO!
 use App\Core\Router;
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
@@ -21,6 +9,42 @@ use App\Controllers\UserController;
 use App\Controllers\VenueController;
 use App\Controllers\SportController;
 use App\Controllers\AdminController;
+
+// Inicia a sessão para toda a aplicação.
+session_start();
+
+// --- Constantes Globais ---
+define('BASE_PATH', __DIR__);
+
+
+/* --- Definição Dinâmica da BASE_URL --- */
+
+// Detecta o protocolo (http ou https)
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+
+// Detecta o host (o domínio, ex: "localhost" ou "colae.42web.io")
+$host = $_SERVER['HTTP_HOST'];
+
+if ($host == 'localhost') {
+    // --- AMBIENTE LOCAL (SEU PC) ---
+    define('BASE_URL', 'http://localhost/colae');
+    define('BASE_DIR_URL', '/colae'); // <-- A NOVA CONSTANTE PARA O ROUTER
+
+} else {
+    // --- AMBIENTE DE PRODUÇÃO (InfinityFree) ---
+    define('BASE_URL', $protocol . '://' . $host);
+    define('BASE_DIR_URL', ''); // <-- A NOVA CONSTANTE PARA O ROUTER (vazio)
+}
+
+/* -------------------------------------- */
+
+
+// --- Autoloader do Composer ---
+require_once BASE_PATH . '/vendor/autoload.php';
+
+// --- Configurações Personalizadas ---
+require_once BASE_PATH . '/config.php';
+
 
 // --- Instância do Roteador ---
 $router = new Router();

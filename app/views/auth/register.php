@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Conta - Kolae</title>
+    <title>Kolae</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,22 +22,6 @@
             font-family: 'Poppins', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fadeInUp {
-            animation: fadeInUp 0.7s ease-out forwards;
-        }
     </style>
 </head>
 
@@ -48,7 +32,7 @@
         <div class="hidden lg:flex w-1/2 bg-cover bg-center relative items-center justify-center" style="background-image: url('https://images.pexels.com/photos/1571658/pexels-photo-1571658.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');">
             <div class="absolute inset-0 bg-black/60"></div>
             <div class="relative z-10 text-center px-12 animate-fadeInUp">
-                <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-16 mx-auto mb-6">
+                <img src="<?php echo BASE_URL; ?>/assets/img/kolae_branca.png" alt="Logo Kolae" class="h-16 mx-auto mb-6">
                 <h1 class="text-4xl font-bold leading-tight">Junte-se à comunidade que não para.</h1>
                 <p class="mt-4 text-lg text-gray-300">Crie sua conta e comece a se conectar com outros atletas hoje mesmo.</p>
             </div>
@@ -58,7 +42,7 @@
         <div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
             <div class="w-full max-w-md bg-[#161B22] p-8 rounded-2xl border border-gray-800 lg:border-none lg:bg-transparent lg:p-0 animate-fadeInUp" style="animation-delay: 200ms;">
                 <a href="index.html" class="lg:hidden mb-6 inline-block w-full text-center">
-                    <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10 mx-auto">
+                    <img src="<?php echo BASE_URL; ?>/assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10 mx-auto">
                 </a>
 
                 <h2 class="text-3xl font-bold text-center mb-2">Crie sua Conta</h2>
@@ -68,12 +52,21 @@
                 <?php if (isset($_GET['error'])): ?>
                     <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-center mb-6 text-sm">
                         <?php
-                        if ($_GET['error'] === 'password_mismatch') {
-                            echo 'As senhas não coincidem. Por favor, tente novamente.';
-                        } else if ($_GET['error'] === 'generic') {
-                            echo 'Ocorreu um erro ao criar a conta. Tente mais tarde.';
-                        } else {
-                            echo 'Ocorreu um erro desconhecido.';
+                        switch ($_GET['error']) {
+                            case 'password_mismatch':
+                                echo 'As senhas não coincidem. Por favor, tente novamente.';
+                                break;
+                            case 'generic':
+                                echo 'Ocorreu um erro ao criar a conta. Tente mais tarde.';
+                                break;
+                            case 'email_exists':
+                                echo 'Este e-mail já está cadastrado. Tente fazer login.';
+                                break;
+                            case 'underage':
+                                echo 'Você precisa ter pelo menos 18 anos para se cadastrar.';
+                                break;
+                            default:
+                                echo 'Ocorreu um erro desconhecido.';
                         }
                         ?>
                     </div>

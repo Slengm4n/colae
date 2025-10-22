@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Kolae</title>
+    <title>Kolae</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,23 +22,6 @@
             font-family: 'Poppins', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
-
-        /* Animação de entrada suave */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fadeInUp {
-            animation: fadeInUp 0.7s ease-out forwards;
-        }
     </style>
 </head>
 
@@ -49,7 +32,7 @@
         <div class="hidden lg:flex w-1/2 bg-cover bg-center relative items-center justify-center" style="background-image: url('https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');">
             <div class="absolute inset-0 bg-black/60"></div>
             <div class="relative z-10 text-center px-12 animate-fadeInUp">
-                <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-16 mx-auto mb-6">
+                <img src="<?php echo BASE_URL; ?>/assets/img/kolae_branca.png" alt="Logo Kolae" class="h-16 mx-auto mb-6">
                 <h1 class="text-4xl font-bold leading-tight">Sua jornada esportiva começa aqui.</h1>
                 <p class="mt-4 text-lg text-gray-300">Conecte-se, treine e evolua com a maior comunidade de atletas.</p>
             </div>
@@ -127,4 +110,3 @@
 </body>
 
 </html>
-

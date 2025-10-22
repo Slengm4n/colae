@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerir Utilizadores - Admin Kolae</title>
+    <title>Kolae</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -84,10 +84,57 @@
                 <i class="fas fa-bars text-2xl"></i>
             </button>
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-                <h1 class="text-3xl font-bold mb-4 sm:mb-0">Gerir Utilizadores</h1>
+                <h1 class="text-3xl font-bold mb-4 sm:mb-0">Gerir Usuários</h1>
                 <a href="<?php echo BASE_URL; ?>/admin/usuarios/criar" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors">
-                    <i class="fas fa-plus mr-2"></i>Novo Utilizador
+                    <i class="fas fa-plus mr-2"></i>Novo Usuário
                 </a>
+            </div>
+            <div class="mb-6 space-y-4">
+                <?php if (isset($_GET['status'])): ?>
+                    <?php
+                    $message = '';
+                    $bgColor = 'bg-green-800'; // Cor padrão para sucesso
+                    $textColor = 'text-green-200';
+
+                    switch ($_GET['status']) {
+                        case 'updated':
+                            $message = 'Usuário atualizado com sucesso!';
+                            break;
+                        case 'deleted':
+                            $message = 'Usuário desativado com sucesso!';
+                            break;
+                        case 'not_found': // Caso tente editar/excluir ID inválido
+                            $message = 'Usuário não encontrado.';
+                            $bgColor = 'bg-yellow-800'; // Cor de aviso
+                            $textColor = 'text-yellow-200';
+                            break;
+                        case 'error': // Erro genérico do update/delete
+                        case 'error_create': // Erro específico do create (se User::create falhar)
+                            $message = 'Ocorreu um erro inesperado ao processar a sua solicitação.';
+                            $bgColor = 'bg-red-800'; // Cor de erro
+                            $textColor = 'text-red-200';
+                            break;
+                            // Adicione outros casos de 'status' que você possa usar
+                    }
+                    ?>
+                    <?php if (!empty($message)): ?>
+                        <div class="p-4 text-sm rounded-lg <?php echo $bgColor; ?> <?php echo $textColor; ?>" role="alert">
+                            <?php echo htmlspecialchars($message); ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <?php /* Bloco separado para ?error=..., se você usar */ ?>
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="p-4 text-sm rounded-lg bg-red-800 text-red-200" role="alert">
+                        <?php
+                        // Exemplo: se você redirecionar com ?error=algum_erro_especifico
+                        // if ($_GET['error'] === 'algum_erro_especifico') { echo 'Mensagem específica.'; }
+                        // else { echo 'Ocorreu um erro desconhecido.'; }
+                        echo 'Ocorreu um erro desconhecido.'; // Mensagem padrão
+                        ?>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="bg-[#161B22] rounded-2xl border border-gray-800 overflow-hidden">
                 <div class="overflow-x-auto">
