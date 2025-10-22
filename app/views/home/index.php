@@ -25,6 +25,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         /* Animação para o carrossel de parceiros */
@@ -51,6 +52,24 @@
         .swiper-pagination-bullet-active {
             background: #38BDF8;
             /* Cor de destaque */
+        }
+
+        /* ... (seus outros estilos como .animate-scroll, .swiper-pagination-bullet, etc. ficam aqui) ... */
+
+        .vimeo-bg-cover {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -2;
+
+            /* Mágica para forçar o "cover" (assumindo vídeo 16:9) */
+            width: 100vw;
+            height: 56.25vw;
+            /* 100 * (9/16) = 56.25 */
+            min-height: 100vh;
+            min-width: 177.78vh;
+            /* 100 * (16/9) = 177.78 */
         }
     </style>
 </head>
@@ -91,10 +110,13 @@
     <main>
         <!-- ==================== SEÇÃO HERO (VÍDEO) ==================== -->
         <section class="relative h-screen flex items-center justify-center text-center md:justify-start md:text-left p-0">
-            <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-[-2]">
-                <source src="./assets/img/video_bg.mp4" type="video/mp4">
-                Seu navegador não suporta vídeos.
-            </video>
+            <iframe
+                                src="https://player.vimeo.com/video/1129399439?background=1&autoplay=1&loop=1&muted=1&autopause=0"
+                                class="vimeo-bg-cover"
+                                frameborder="0"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
             <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-[-1]"></div>
             <div class="container mx-auto px-4 relative z-10">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold max-w-lg leading-tight mx-auto md:mx-0">Cole com quem ama esporte</h1>
