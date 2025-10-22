@@ -1,68 +1,120 @@
-
 <?php
-require_once __DIR__ . '/../models/Sport.php';
+
+namespace App\Controllers;
+
+use App\Core\AuthHelper;
+use App\Core\ViewHelper;
+use App\Models\Sport;
 
 class SportController
 {
-
+    /*** Exibe a lista de todos os esportes.*/
     public function index()
     {
-        $sports = Sport::getAll();
-        require __DIR__ . '/../views/sports/index.php';
+        AuthHelper::checkAdmin();
+
+        $data = [
+            'userName' => $_SESSION['user_name'] ?? 'Admin',
+            'sports' => Sport::getAll()
+        ];
+
+        ViewHelper::render('sports/index', $data);
     }
 
+    /*** Exibe o formulário para criar um novo esporte.*/
     public function create()
     {
-        require __DIR__ . '/../views/sports/create.php';
+        AuthHelper::checkAdmin();
+
+        $data = ['userName' => $_SESSION['user_name'] ?? 'Admin'];
+
+        // --- CORREÇÃO AQUI ---
+        ViewHelper::render('sports/create', $data);
     }
 
+    /*** Salva um novo esporte no banco de dados.*/
     public function store()
     {
+        AuthHelper::checkAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (Sport::create($_POST['name'])) {
-                header('Location: /colae/esportes');
-                exit;
-            } else {
-                echo "Erro ao criar esporte";
+            $data = [
+                'name' => trim($_POST['name'] ?? ''),
+                'icon' => trim($_POST['icon'] ?? 'fa-question-circle')
+            ];
+
+            if (!empty($data['name'])) {
+                if (Sport::create($data)) {
+                    header('Location: ' . BASE_URL . '/admin/esportes?status=created_success');
+                    exit;
+                }
             }
         }
+        header('Location: ' . BASE_URL . '/admin/esportes/criar?status=error');
+        exit;
     }
 
-    public function edit($id)
+    /**
+     * Exibe o formulário para editar um desporto.
+     * @param int $id O ID do desporto.
+     */
+    public function edit(int $id)
     {
-        $sport = new Sport;
-        $sportData = $sport->readOne($id);
-        if (!$sportData) {
-            header("Location: /colae/esportes");
+        AuthHelper::checkAdmin();
+        $sport = Sport::findById($id);
+
+        if (!$sport) {
+            header("Location: " . BASE_URL . "/admin/esportes?status=not_found");
             exit;
         }
-        require __DIR__ . "/../views/sports/edit.php";
+
+        $data = [
+            'userName' => $_SESSION['user_name'] ?? 'Admin',
+            'sport' => $sport
+        ];
+
+        // --- CORREÇÃO AQUI ---
+        ViewHelper::render('sports/edit', $data);
     }
 
+    /*** Atualiza um esporte existente no banco de dados.*/
     public function update()
     {
-        if ($_SERVER["REQUEST_METHOD"] === 'POST' && isset($_POST['id'])) {
-            $sport = new Sport();
-            $sport->id = $_POST['id'];
-            $sport->name = htmlspecialchars($_POST['name']);
+        AuthHelper::checkAdmin();
 
-            if ($sport->update()) {
-                header('Location: /colae/esportes');
-                exit;
-            } else {
-                header('Location: /colae/esportes/editar/' . $_POST['id'] . "?status=erro");
-                exit;
+        if ($_SERVER["REQUEST_METHOD"] === 'POST' && isset($_POST['id'])) {
+            $id = (int)$_POST['id'];
+            $data = [
+                'name' => trim($_POST['name'] ?? ''),
+                'icon' => trim($_POST['icon'] ?? 'fa-question-circle')
+            ];
+
+            if (!empty($data['name'])) {
+                if (Sport::update($id, $data)) {
+                    header('Location: ' . BASE_URL . '/admin/esportes?status=updated_success');
+                    exit;
+                }
             }
         }
+
+        $redirectId = isset($_POST['id']) ? '/' . $_POST['id'] : '';
+        header('Location: ' . BASE_URL . '/admin/esportes/editar' . $redirectId . "?status=error");
+        exit;
     }
 
-    public function delete($id)
+    /**
+     * Deleta um desporto.
+     * @param int $id O ID do desporto.
+     */
+    public function delete(int $id)
     {
+        AuthHelper::checkAdmin();
+
         if (Sport::delete($id)) {
-            header("Location: /colae/esportes");
-            exit;
+            header("Location: " . BASE_URL . "/admin/esportes?status=deleted_success");
         } else {
-            echo "Erro ao excluir usuario";
+            header("Location: " . BASE_URL . "/admin/esportes?status=error");
         }
+        exit;
     }
 }

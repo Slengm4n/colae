@@ -1,158 +1,226 @@
 <?php
-require_once __DIR__ . '/../models/Venue.php';
-require_once __DIR__ . '/../models/Address.php'; // <-- Include the new Address model
-require_once __DIR__ . '/../core/AuthHelper.php';
+
+namespace App\Controllers;
+
+use App\Core\AuthHelper;
+use App\Core\ViewHelper;
+use App\Models\Venue;
+use App\Models\User;
+use App\Models\Address;
+use App\Models\VenueImage;
 
 class VenueController
 {
+    /*** Exibe a lista de quadras do usuário logado.*/
+    public function index()
+    {
+        AuthHelper::check();
+        $venues = Venue::findByUserId($_SESSION['user_id']);
 
+        $data = [
+            'userName' => $_SESSION['user_name'] ?? 'Usuário',
+            'venues' => $venues
+        ];
+
+        ViewHelper::render('venues/index', $data);
+    }
+
+    /*** Exibe o formulário para criar uma nova quadra.*/
+    public function create()
+    {
+        $this->checkCpfStatus();
+        $data = ['userName' => $_SESSION['user_name'] ?? 'Usuário'];
+        ViewHelper::render('venues/create', $data);
+    }
+
+    /*** Salva uma nova quadra, seu endereço e suas imagens no banco de dados.*/
+    public function store()
+    {
+        $this->checkCpfStatus();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // 1. Cria o endereço e obtém o ID
+            $addressData = [
+                'cep' => $_POST['cep'],
+                'street' => $_POST['street'],
+                'number' => $_POST['number'],
+                'neighborhood' => $_POST['neighborhood'],
+                'complement' => $_POST['complement'] ?? null,
+                'city' => $_POST['city'],
+                'state' => $_POST['state']
+            ];
+            $addressId = Address::create($addressData);
+
+            if (!$addressId) {
+                // Tratar erro de criação de endereço
+                header('Location: ' . BASE_URL . '/quadras/criar?status=address_error');
+                exit;
+            }
+
+            // 2. Cria a quadra usando o ID do endereço
+            $venueData = [
+                'user_id' => $_SESSION['user_id'],
+                'address_id' => $addressId,
+                'name' => $_POST['name'],
+                'average_price_per_hour' => $_POST['average_price_per_hour'],
+                'court_capacity' => $_POST['court_capacity'],
+                'has_leisure_area' => $_POST['has_leisure_area'] ?? 0,
+                'leisure_area_capacity' => $_POST['leisure_area_capacity'] ?? null,
+                'floor_type' => $_POST['floor_type'],
+                'has_lighting' => $_POST['has_lighting'] ?? 0,
+                'is_covered' => $_POST['is_covered'] ?? 0
+            ];
+            $venueId = Venue::create($venueData);
+
+            if (!$venueId) {
+                // Tratar erro de criação de quadra
+                header('Location: ' . BASE_URL . '/quadras/criar?status=venue_error');
+                exit;
+            }
+
+            // 3. Processa e salva as imagens
+            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                $this->handleImageUploads($venueId);
+            }
+
+            header('Location: ' . BASE_URL . '/dashboard?status=venue_created');
+            exit;
+        }
+    }
+
+    /**
+     * Exibe o formulário para editar uma quadra.
+     * @param int $id
+     */
+    public function edit(int $id)
+    {
+        AuthHelper::check();
+        $venue = Venue::findById($id);
+
+        // Validação de segurança: o usuário só pode editar suas próprias quadras
+        if (!$venue || $venue['user_id'] != $_SESSION['user_id']) {
+            header('Location: ' . BASE_URL . '/dashboard?error=not_found');
+            exit;
+        }
+
+        $data = [
+            'userName' => $_SESSION['user_name'] ?? 'Usuário',
+            'venue' => $venue
+        ];
+        ViewHelper::render('venues/edit', $data);
+    }
+
+    /**
+     * Atualiza uma quadra e seu endereço.
+     * @param int $id
+     */
+    public function update(int $id)
+    {
+        AuthHelper::check();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Validação de segurança
+            $venue = Venue::findById($id);
+            if (!$venue || $venue['user_id'] != $_SESSION['user_id']) {
+                header('Location: ' . BASE_URL . '/dashboard?error=unauthorized');
+                exit;
+            }
+
+            // 1. Atualiza o endereço
+            $addressData = [
+                'cep' => $_POST['cep'],
+                'street' => $_POST['street'],
+                'number' => $_POST['number'],
+                'neighborhood' => $_POST['neighborhood'],
+                'complement' => $_POST['complement'] ?? null,
+                'city' => $_POST['city'],
+                'state' => $_POST['state']
+            ];
+            Address::update((int)$_POST['address_id'], $addressData);
+
+            // 2. Atualiza a quadra
+            $venueData = [
+                'name' => $_POST['name'],
+                'average_price_per_hour' => $_POST['average_price_per_hour'],
+                'court_capacity' => $_POST['court_capacity'],
+                'has_leisure_area' => $_POST['has_leisure_area'] ?? 0,
+                'leisure_area_capacity' => $_POST['leisure_area_capacity'] ?? null,
+                'floor_type' => $_POST['floor_type'],
+                'has_lighting' => $_POST['has_lighting'] ?? 0,
+                'is_covered' => $_POST['is_covered'] ?? 0,
+                'status' => $_POST['status'] ?? 'available'
+            ];
+            Venue::update($id, $venueData);
+
+            // Lógica para upload de novas imagens (opcional)
+
+            header('Location: ' . BASE_URL . '/dashboard?status=venue_updated');
+            exit;
+        }
+    }
+
+    /**
+     * Deleta (soft delete) uma quadra.
+     * @param int $id
+     */
+    public function delete(int $id)
+    {
+        AuthHelper::check();
+        // Validação de segurança
+        $venue = Venue::findById($id);
+        if (!$venue || $venue['user_id'] != $_SESSION['user_id']) {
+            header('Location: ' . BASE_URL . '/dashboard?error=unauthorized');
+            exit;
+        }
+
+        if (Venue::delete($id)) {
+            header("Location: " . BASE_URL . "/dashboard?status=deleted");
+        } else {
+            header("Location: " . BASE_URL . "/dashboard?status=error");
+        }
+        exit;
+    }
+
+
+    // --- MÉTODOS PRIVADOS DE AJUDA ---
+
+    /**
+     * Verifica se o usuário tem um CPF cadastrado, redirecionando caso não tenha.
+     */
     private function checkCpfStatus()
     {
         AuthHelper::check();
-        if (empty($_SESSION['user_cpf'])) {
-            // Se não tiver CPF, redireciona para o dashboard com uma mensagem
+        $user = User::findById($_SESSION['user_id']);
+        if (empty($user['cpf'])) {
             header('Location: ' . BASE_URL . '/dashboard?error=cpf_required');
             exit;
         }
     }
 
-    public function index()
-    {
-        AuthHelper::check();
-        // Venue::getAll() now correctly joins the address data
-        $venues = Venue::getAll();
-        require BASE_PATH . '/app/views/venues/index.php';
-    }
-
     /**
-     * Show the form for creating a new venue.
+     * Processa o upload de múltiplas imagens para uma quadra.
+     * @param int $venueId
      */
-    public function create()
+    private function handleImageUploads(int $venueId)
     {
-        AuthHelper::check();
-        $this->checkCpfStatus();
-        require BASE_PATH . '/app/views/venues/create.php';
-    }
+        $uploadDir = BASE_PATH . "/public/uploads/venues/" . $venueId . "/";
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
 
-    /**
-     * Store a newly created venue and its address in the database.
-     */
-    public function store()
-    {
-        AuthHelper::check();
-        $this->checkCpfStatus();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $imageCount = count($_FILES['images']['name']);
+        for ($i = 0; $i < $imageCount; $i++) {
+            if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                $tmpName = $_FILES['images']['tmp_name'][$i];
+                $originalName = $_FILES['images']['name'][$i];
+                $fileExtension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                $newFileName = uniqid('venue_', true) . '.' . $fileExtension;
+                $destinationPath = $uploadDir . $newFileName;
 
-            // Passo 1: Obter o ID do usuário logado
-            $userId = $_SESSION['user_id'];
-
-            // Passo 2: Criar o registro de Endereço primeiro e obter seu novo ID
-            // Corrigido para passar todos os argumentos que o Address::create espera
-            $addressId = Address::create(
-                $_POST['cep'],
-                $_POST['street'],
-                $_POST['number'],
-                $_POST['neighborhood'],
-                $_POST['complement'],
-                $_POST['city'],
-                $_POST['state']
-            );
-
-            // Passo 3: Criar o registro de Quadra usando o novo ID do endereço
-            if ($addressId && Venue::create(
-                $userId,
-                $addressId,
-                $_POST['name'],
-                $_POST['average_price_per_hour'],
-                $_POST['court_capacity'],
-                $_POST['has_leisure_area'],
-                $_POST['leisure_area_capacity'],
-                $_POST['floor_type'],
-                $_POST['has_lighting'],
-                $_POST['is_covered']
-                // status tem um valor padrão, então não precisamos passar
-            )) {
-                header('Location: ' . BASE_URL . '/quadras');
-                exit;
-            } else {
-                Logger::getInstance()->error('Erro ao criar quadra ou endereço', ['user_id' => $userId]);
-                echo "Erro ao criar quadra ou endereço.";
+                // Aqui você pode adicionar a otimização de imagem se tiver um ImageHelper
+                if (move_uploaded_file($tmpName, $destinationPath)) {
+                    VenueImage::create($venueId, $newFileName);
+                }
             }
-        }
-    }
-
-    /**
-     * Show the form for editing a specific venue.
-     * @param int $id The ID of the venue to edit.
-     */
-    public function edit($id)
-    {
-        AuthHelper::check();
-
-        // Fetch the combined venue and address data to pre-fill the form
-        $venue = Venue::readOne($id);
-
-        if (!$venue) {
-            // Handle case where venue doesn't exist
-            echo "Quadra não encontrada.";
-            exit;
-        }
-
-        // Pass the $venue data to the view
-        require BASE_PATH . '/app/views/venues/edit.php';
-    }
-
-    /**
-     * Update the specified venue and its address in the database.
-     * @param int $id The ID of the venue to update.
-     */
-    public function update($id)
-    {
-        var_dump($_POST);
-        die();
-
-        AuthHelper::check();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-            // Passo 1: Atualizar a tabela de Endereços
-            $address = new Address();
-            $address->id = $_POST['address_id']; // Vem do campo oculto do formulário
-            $address->cep = htmlspecialchars($_POST['cep']);
-            $address->street = htmlspecialchars($_POST['street']);
-            $address->number = htmlspecialchars($_POST['number']);
-            $address->neighborhood = htmlspecialchars($_POST['neighborhood']);
-            $address->complement = htmlspecialchars($_POST['complement']);
-            $address->city = htmlspecialchars($_POST['city']);
-            $address->state = htmlspecialchars($_POST['state']);
-            $addressUpdated = $address->update(); // Chama o método de atualização do Address
-
-            // Passo 2: Atualizar a tabela de Quadras (Venue)
-            $venue = new Venue();
-            $venue->id = $id;
-            // ... (resto dos campos da quadra) ...
-            $venueUpdated = $venue->update();
-
-            if ($venueUpdated && $addressUpdated) {
-                header('Location: ' . BASE_URL . '/quadras');
-                exit;
-            } else {
-                echo "Erro ao atualizar a quadra ou o endereço.";
-            }
-        }
-    }
-
-    /**
-     * "Soft delete" the specified venue.
-     * @param int $id The ID of the venue to delete.
-     */
-    public function delete($id)
-    {
-        AuthHelper::check();
-        if (Venue::delete($id)) {
-            header("Location: " . BASE_URL . '/quadras');
-            exit;
-        } else {
-            echo "Erro ao excluir quadra";
         }
     }
 }

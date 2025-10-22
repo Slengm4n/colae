@@ -1,105 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <title>Criar Conta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Kolae</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        /* Usando o mesmo estilo da tela de login para manter a consistência */
         body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-            padding: 20px 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .register-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.5rem;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.7rem;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 1rem;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 1rem;
+        .animate-fadeInUp {
+            animation: fadeInUp 0.7s ease-out forwards;
         }
     </style>
 </head>
 
-<body>
-    <div class="register-container">
-        <h1>Crie sua Conta</h1>
+<body class="bg-[#0D1117] text-white">
 
-        <?php if (isset($error)): ?>
-            <p class="error"><?php echo htmlspecialchars($error); ?></p>
-        <?php endif; ?>
+    <div class="flex min-h-screen">
+        <!-- Seção da Imagem (Esquerda) -->
+        <div class="hidden lg:flex w-1/2 bg-cover bg-center relative items-center justify-center" style="background-image: url('https://images.pexels.com/photos/1571658/pexels-photo-1571658.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');">
+            <div class="absolute inset-0 bg-black/60"></div>
+            <div class="relative z-10 text-center px-12 animate-fadeInUp">
+                <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-16 mx-auto mb-6">
+                <h1 class="text-4xl font-bold leading-tight">Junte-se à comunidade que não para.</h1>
+                <p class="mt-4 text-lg text-gray-300">Crie sua conta e comece a se conectar com outros atletas hoje mesmo.</p>
+            </div>
+        </div>
 
-        <form action="<?php echo BASE_URL; ?>/register/store" method="POST">
-            <div class="form-group">
-                <label for="name">Nome Completo:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="birthdate">Data de Nascimento:</label>
-                <input type="date" id="birthdate" name="birthdate" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit">Registrar</button>
-        </form>
+        <!-- Seção do Formulário (Direita) -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+            <div class="w-full max-w-md bg-[#161B22] p-8 rounded-2xl border border-gray-800 lg:border-none lg:bg-transparent lg:p-0 animate-fadeInUp" style="animation-delay: 200ms;">
+                <a href="index.html" class="lg:hidden mb-6 inline-block w-full text-center">
+                    <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10 mx-auto">
+                </a>
 
-        <div class="login-link">
-            <p>Já possui conta? <a href="<?php echo BASE_URL; ?>/login">Faça Login</a></p>
+                <h2 class="text-3xl font-bold text-center mb-2">Crie sua Conta</h2>
+                <p class="text-gray-400 text-center mb-8">É rápido e fácil!</p>
+
+                <!-- Bloco para exibir mensagens de erro -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg text-center mb-6 text-sm">
+                        <?php
+                        if ($_GET['error'] === 'password_mismatch') {
+                            echo 'As senhas não coincidem. Por favor, tente novamente.';
+                        } else if ($_GET['error'] === 'generic') {
+                            echo 'Ocorreu um erro ao criar a conta. Tente mais tarde.';
+                        } else {
+                            echo 'Ocorreu um erro desconhecido.';
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
+
+                <form action="<?php echo BASE_URL; ?>/register/store" method="POST" class="space-y-5">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300">Nome Completo</label>
+                        <div class="mt-1">
+                            <input id="name" name="name" type="text" autocomplete="name" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+                        <div class="mt-1">
+                            <input id="email" name="email" type="email" autocomplete="email" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="birthdate" class="block text-sm font-medium text-gray-300">Data de Nascimento</label>
+                        <div class="mt-1">
+                            <input id="birthdate" name="birthdate" type="date" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm text-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Senha</label>
+                        <div class="mt-1">
+                            <input id="password" name="password" type="password" autocomplete="new-password" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-300">Confirmar Senha</label>
+                        <div class="mt-1">
+                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-black bg-cyan-400 hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-cyan-400 transition-colors">
+                            Registrar
+                        </button>
+                    </div>
+                </form>
+
+                <p class="mt-8 text-center text-sm text-gray-400">
+                    Já possui uma conta?
+                    <a href="<?php echo BASE_URL; ?>/login" class="font-medium text-cyan-400 hover:text-cyan-300">Faça Login</a>
+                </p>
+            </div>
         </div>
     </div>
+
 </body>
 
 </html>

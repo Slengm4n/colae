@@ -1,79 +1,110 @@
-
 <?php
 
-require_once '../app/core/Database.php';
+namespace App\Models;
 
+use App\Core\Database;
+use PDO;
+
+/**
+ * Class Sport
+ * Gerencia todas as operações de banco de dados para a entidade de desporto.
+ */
 class Sport
 {
-
-    //Variaveis publicas para armazenar os dados dos esportes
-
-    public $id;
-    public $name;
-
-    public static function getAll()
+    /**
+     * Conta o total de desportos ativos.
+     * @return int
+     */
+    public static function countAll(): int
     {
-
         $pdo = Database::getConnection();
-
-        $query = "SELECT * FROM sports WHERE status = 'active' ORDER BY created_at DESC";
-        $stmt = $pdo->prepare($query) ;
+        $query = "SELECT COUNT(id) FROM sports WHERE status = 'active'";
+        $stmt = $pdo->prepare($query);
         $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 
+    /**
+     * Busca todos os desportos ATIVOS.
+     * @return array
+     */
+    public static function getAll(): array
+    {
+        $pdo = Database::getConnection();
+        // --- CORREÇÃO AQUI ---
+        // Adicionamos o filtro para buscar apenas desportos com status 'active'.
+        $query = "SELECT * FROM sports WHERE status = 'active' ORDER BY name ASC";
+        // --- FIM DA CORREÇÃO ---
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function create($name)
+    /**
+     * Busca um desporto específico pelo seu ID.
+     * @param int $id
+     * @return mixed
+     */
+    public static function findById(int $id)
     {
         $pdo = Database::getConnection();
-
-        $query = "INSERT INTO sports (name, status) VALUES (:name, 'active')";
-        $stmt = $pdo->prepare($query);
-
-        $stmt->bindParam(":name", $name);
-
-        return $stmt->execute();
-    }
-
-    public function readOne($id)
-    {
-
-        $pdo = Database::getConnection();
-
         $query = "SELECT * FROM sports WHERE id = :id";
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-        $sportData = $stmt->fetch(PDO::FETCH_ASSOC);
+    /**
+     * Cria um novo desporto no banco de dados.
+     * @param array $data
+     * @return bool
+     */
+    public static function create(array $data): bool
+    {
+        $pdo = Database::getConnection();
+        $data['status'] = 'active'; // Define um status padrão
+        $query = "INSERT INTO sports (name, icon, status) VALUES (:name, :icon, :status)";
+        $stmt = $pdo->prepare($query);
+        return $stmt->execute($data);
+    }
 
-        if ($sportData) {
-            $this->id = $sportData['id'];
-            $this->name = $sportData['name'];
+    /**
+     * Atualiza um desporto existente.
+     * @param int $id
+     * @param array $data
+     * @return bool
+     */
+    public static function update(int $id, array $data): bool
+    {
+        if (empty($data)) {
+            return true;
         }
 
-        return $sportData;
-    }
-
-    public function update(){
-
         $pdo = Database::getConnection();
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            $fields[] = "$key = :$key";
+        }
+        $query = "UPDATE sports SET " . implode(', ', $fields) . " WHERE id = :id";
 
-        $query = 'UPDATE sports SET name = :name WHERE id = :id';
         $stmt = $pdo->prepare($query);
 
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':name', $this->name);
+        // --- CORREÇÃO AQUI ---
+        // Adicionamos o ID ao array de dados antes de executar a query.
+        $data['id'] = $id;
+        // --- FIM DA CORREÇÃO ---
 
-        return $stmt->execute();
+        return $stmt->execute($data);
     }
 
-    public static function delete($id){
-        $pdo = Database::getConnection();
-        $query = "UPDATE sports SET status = 'inactive' WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(":id", $id);
-
-        return $stmt->execute();
+    /**
+     * Realiza um "soft delete" de um desporto.
+     * @param int $id
+     * @return bool
+     */
+    public static function delete(int $id): bool
+    {
+        return self::update($id, ['status' => 'inactive']);
     }
 }

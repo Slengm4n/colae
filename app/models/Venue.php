@@ -1,25 +1,34 @@
 <?php
 
-require_once __DIR__ . '/../core/Database.php';
+namespace App\Models;
 
+use App\Core\Database;
+use PDO;
+
+/**
+ * Class Venue
+ * Gerencia todas as operações de banco de dados para a entidade de quadra/local.
+ */
 class Venue
 {
-    public $id;
-    public $user_id;
-    public $address_id;
-    public $name;
-    public $average_price_per_hour;
-    public $court_capacity;
-    public $has_leisure_area;
-    public $leisure_area_capacity;
-    public $floor_type;
-    public $has_lighting;
-    public $is_covered;
-    public $status;
-    public $created_at;
-    public $updated_at;
+    /**
+     * Conta o total de quadras disponíveis.
+     * @return int
+     */
+    public static function countAll(): int
+    {
+        $pdo = Database::getConnection();
+        $query = "SELECT COUNT(id) FROM venues WHERE status = 'available'";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 
-    public static function getAll()
+    /**
+     * Busca todas as quadras disponíveis (para utilizadores finais).
+     * @return array
+     */
+    public static function getAll(): array
     {
         $pdo = Database::getConnection();
         $query = "SELECT v.*, a.street, a.number, a.city 
@@ -31,34 +40,55 @@ class Venue
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function create($userId, $addressId, $name, $averagePricePerHour, $courtCapacity, $hasLeisureArea, $leisureAreaCapacity, $floorType, $hasLighting, $isCovered, $status = 'available')
+    /**
+     * Busca TODAS as quadras no sistema para o painel de admin.
+     * @return array
+     */
+    public static function getAllForAdmin(): array
     {
         $pdo = Database::getConnection();
-        $query = "INSERT INTO venues (user_id, address_id, name, average_price_per_hour, court_capacity, has_leisure_area, leisure_area_capacity, floor_type, has_lighting, is_covered, status) 
-                  VALUES (:user_id, :address_id, :name, :average_price_per_hour, :court_capacity, :has_leisure_area, :leisure_area_capacity, :floor_type, :has_lighting, :is_covered, :status)";
+        $query = "SELECT v.*, u.name as owner_name 
+                  FROM venues v
+                  LEFT JOIN users u ON v.user_id = u.id
+                  ORDER BY v.created_at DESC";
         $stmt = $pdo->prepare($query);
-
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->bindParam(':address_id', $addressId);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':average_price_per_hour', $averagePricePerHour);
-        $stmt->bindParam(':court_capacity', $courtCapacity);
-        $stmt->bindParam(':has_leisure_area', $hasLeisureArea);
-        $stmt->bindParam(':leisure_area_capacity', $leisureAreaCapacity);
-        $stmt->bindParam(':floor_type', $floorType);
-        $stmt->bindParam(':has_lighting', $hasLighting);
-        $stmt->bindParam(':is_covered', $isCovered);
-        $stmt->bindParam(':status', $status);
-        
-        return $stmt->execute();
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function readOne($id)
+    /**
+     * Busca todas as quadras de um utilizador específico.
+     * @param int $userId
+     * @return array
+     */
+    public static function findByUserId(int $userId): array
     {
         $pdo = Database::getConnection();
-        $query = "SELECT 
-                    v.*, 
-                    a.street, a.city, a.state, a.cep, a.number, a.neighborhood, a.complement
+        // --- CORREÇÃO AQUI ---
+        // Trocado para LEFT JOIN para garantir que as quadras apareçam
+        // mesmo que o endereço associado tenha um problema.
+        $query = "SELECT v.*, a.street, a.number,
+                         (SELECT vi.file_path FROM venue_images vi WHERE vi.venue_id = v.id ORDER BY vi.id ASC LIMIT 1) as image_path
+                  FROM venues v
+                  LEFT JOIN addresses a ON v.address_id = a.id
+                  WHERE v.user_id = :user_id
+                  ORDER BY v.created_at DESC";
+        // --- FIM DA CORREÇÃO ---
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Busca uma quadra específica pelo ID, com todos os detalhes do endereço.
+     * @param int $id
+     * @return mixed
+     */
+    public static function findById(int $id)
+    {
+        $pdo = Database::getConnection();
+        $query = "SELECT v.*, a.street, a.city, a.state, a.cep, a.number, a.neighborhood, a.complement
                   FROM venues v
                   JOIN addresses a ON v.address_id = a.id
                   WHERE v.id = :id";
@@ -68,61 +98,75 @@ class Venue
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function getAllWithCoordinates()
-{
-    $pdo = Database::getConnection();
-    // Seleciona apenas quadras que têm coordenadas válidas
-    $query = "SELECT v.name, a.latitude, a.longitude
-              FROM venues v
-              JOIN addresses a ON v.address_id = a.id
-              WHERE a.latitude IS NOT NULL AND a.longitude IS NOT NULL";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
     /**
-     * Atualiza um registro de quadra existente no banco de dados.
+     * Busca todas as quadras com coordenadas para exibição no mapa.
+     * @return array
      */
-    public function update()
+    public static function getAllWithCoordinates(): array
     {
         $pdo = Database::getConnection();
-
-        // Query correta para atualizar a tabela 'venues'
-        $query = "UPDATE venues SET 
-                    name = :name, 
-                    average_price_per_hour = :average_price_per_hour, 
-                    court_capacity = :court_capacity, 
-                    has_leisure_area = :has_leisure_area, 
-                    leisure_area_capacity = :leisure_area_capacity, 
-                    floor_type = :floor_type, 
-                    has_lighting = :has_lighting, 
-                    is_covered = :is_covered,
-                    status = :status
-                  WHERE id = :id";
-                  
+        $query = "SELECT v.id, v.name, a.street, a.number, a.city, a.latitude, a.longitude,
+                         (SELECT vi.file_path FROM venue_images vi WHERE vi.venue_id = v.id ORDER BY vi.id ASC LIMIT 1) as image_path
+                  FROM venues v
+                  JOIN addresses a ON v.address_id = a.id";
         $stmt = $pdo->prepare($query);
-
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':average_price_per_hour', $this->average_price_per_hour);
-        $stmt->bindParam(':court_capacity', $this->court_capacity);
-        $stmt->bindParam(':has_leisure_area', $this->has_leisure_area);
-        $stmt->bindParam(':leisure_area_capacity', $this->leisure_area_capacity);
-        $stmt->bindParam(':floor_type', $this->floor_type);
-        $stmt->bindParam(':has_lighting', $this->has_lighting);
-        $stmt->bindParam(':is_covered', $this->is_covered);
-        $stmt->bindParam(':status', $this->status);
-        $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function delete($id)
+    /**
+     * Cria uma nova quadra no banco de dados.
+     * @param array $data Dados da quadra a serem inseridos.
+     * @return string|false Retorna o ID da nova quadra em caso de sucesso, ou false em caso de falha.
+     */
+    public static function create(array $data)
     {
         $pdo = Database::getConnection();
-        $query = "UPDATE venues SET status = 'unavailable' WHERE id = :id";
+        $data['status'] = $data['status'] ?? 'available';
+
+        $query = "INSERT INTO venues (user_id, address_id, name, average_price_per_hour, court_capacity, has_leisure_area, leisure_area_capacity, floor_type, has_lighting, is_covered, status) 
+                  VALUES (:user_id, :address_id, :name, :average_price_per_hour, :court_capacity, :has_leisure_area, :leisure_area_capacity, :floor_type, :has_lighting, :is_covered, :status)";
+
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-        return $stmt->execute();
+
+        if ($stmt->execute($data)) {
+            return $pdo->lastInsertId();
+        }
+        return false;
+    }
+
+    /**
+     * Atualiza os dados de uma quadra existente.
+     * @param int $id ID da quadra a ser atualizada.
+     * @param array $data Dados a serem atualizados.
+     * @return bool
+     */
+    public static function update(int $id, array $data): bool
+    {
+        if (empty($data)) {
+            return true;
+        }
+
+        $pdo = Database::getConnection();
+        $fields = [];
+        foreach (array_keys($data) as $key) {
+            $fields[] = "$key = :$key";
+        }
+        $query = "UPDATE venues SET " . implode(', ', $fields) . " WHERE id = :id";
+
+        $stmt = $pdo->prepare($query);
+        $data['id'] = $id;
+
+        return $stmt->execute($data);
+    }
+
+    /**
+     * Realiza um soft delete da quadra, alterando seu status para 'unavailable'.
+     * @param int $id
+     * @return bool
+     */
+    public static function delete(int $id): bool
+    {
+        return self::update($id, ['status' => 'unavailable']);
     }
 }

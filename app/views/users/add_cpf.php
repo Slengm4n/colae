@@ -1,99 +1,54 @@
-<?php AuthHelper::start(); ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
-    <title>Adicionar CPF</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-            padding: 20px 0;
-        }
-
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 1.5rem;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            box-sizing: border-box;
-            margin-bottom: 1rem;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.7rem;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: .75rem 1.25rem;
-            margin-bottom: 1rem;
-            border-radius: .25rem;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 1rem;
-            color: #007bff;
-            text-decoration: none;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar CPF - Kolae</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container">
-        <h1>Valide seu Cadastro</h1>
-        <p>Para começar a cadastrar suas quadras, precisamos que você informe um CPF válido. Este passo é importante para a segurança da plataforma.</p>
+<body class="bg-[#0D1117] text-gray-200 font-sans antialiased min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-sm sm:max-w-md text-center border border-gray-700">
+
+        <h1 class="text-2xl font-bold text-gray-50 mb-4">
+            Valide seu Cadastro
+        </h1>
+
+        <p class="text-gray-400 mb-6 text-sm sm:text-base leading-relaxed">
+            Para começar a cadastrar suas quadras, precisamos que você informe um CPF válido. Este passo é importante para a segurança da plataforma.
+        </p>
 
         <?php if (isset($error)): ?>
-            <p class="error"><?php echo htmlspecialchars($error); ?></p>
+            <div class="bg-red-900/40 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-6 text-left text-sm" role="alert">
+                <p><?php echo htmlspecialchars($error); ?></p>
+            </div>
         <?php endif; ?>
 
         <form action="<?php echo BASE_URL; ?>/dashboard/cpf" method="POST">
-            <div class="form-group">
-                <label for="cpf" style="display:none;">CPF</label>
-                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+            <div class="mb-5 text-left">
+                <label for="cpf" class="block text-gray-300 font-medium mb-2 text-sm">
+                    CPF
+                </label>
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-500
+                              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-base">
             </div>
-            <button type="submit">Validar e Salvar CPF</button>
+
+            <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors duration-200 shadow-md">
+                Validar e Salvar CPF
+            </button>
         </form>
-        <a href="<?php echo BASE_URL; ?>/dashboard" class="back-link">Voltar ao Painel</a>
+
+        <a href="<?php echo BASE_URL; ?>/dashboard"
+            class="inline-block mt-6 text-blue-400 hover:text-blue-300 hover:underline text-sm font-medium transition-colors duration-200">
+            Voltar ao Painel
+        </a>
     </div>
 
     <script>
-        // Máscara simples para o campo CPF
         document.getElementById('cpf').addEventListener('input', function(e) {
             var value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{3})(\d)/, '$1.$2');
