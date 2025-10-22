@@ -53,30 +53,32 @@ class AuthController
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $birthdate = $_POST['birthdate'];
-            $password = $_POST['password'];
-            $password_confirmation = $_POST['password_confirmation'];
-
             // --- VALIDAÇÃO ---
-            if ($password !== $password_confirmation) {
+            if ($_POST['password'] !== $_POST['password_confirmation']) {
                 header('Location: ' . BASE_URL . '/register?error=password_mismatch');
                 exit;
             }
-            if (!$this->isOver18($birthdate)) {
+            if (!$this->isOver18($_POST['birthdate'])) {
                 header('Location: ' . BASE_URL . '/register?error=underage');
                 exit;
             }
-            if (User::findByEmail($email)) {
+            if (User::findByEmail($_POST['email'])) {
                 header('Location: ' . BASE_URL . '/register?error=email_exists');
                 exit;
             }
 
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $default_role = 'user';
+            // --- CORREÇÃO APLICADA AQUI ---
+            // Agrupe os dados em um array associativo
+            $userData = [
+                'name' => $_POST['name'],
+                'email' => $_POST['email'],
+                'birthdate' => $_POST['birthdate'],
+                'password_hash' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+                'role' => 'user' // Define a role padrão
+            ];
 
-            if (User::create($name, $email, $birthdate, $password_hash, $default_role)) {
+            // Passe o array único para o método create
+            if (User::create($userData)) {
                 header('Location: ' . BASE_URL . '/login?status=registered');
                 exit;
             } else {
