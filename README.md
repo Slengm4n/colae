@@ -75,7 +75,7 @@ Esta plataforma visa criar uma comunidade engajada onde os usuários podem encon
 
 O deploy para o ambiente de produção (InfinityFree) é feito automaticamente via **GitHub Actions** sempre que um `push` é realizado na branch `main`. O workflow copia os arquivos via FTP.
 
-![Logo](https://i.postimg.cc/63c3ctPJ/Texto-Preto-fundo-branco.png)
+![Logo](https://i.postimg.cc/d1d4KhG5/Logo-Preta-preenchimento-branco.png)
 
 ## 📄 Licença
 
