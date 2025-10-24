@@ -55,7 +55,7 @@ Esta plataforma visa criar uma comunidade engajada onde os usuários podem encon
 
 3.  **Instale as dependências do Composer:**
 
-- Certifique-se de ter um ambiente local (XAMPP, WAMP, etc.) com Apache, MySQL/MariaDB e PHP (versão X.Y+).
+- Certifique-se de ter um ambiente local (XAMPP, WAMP, etc.) com Apache, MySQL/MariaDB e PHP (versão 8.1+).
 
   - **Crie um banco de dados vazio** no seu MySQL/MariaDB (ex: via phpMyAdmin) com o nome que desejar (ex: `kolae_local`).
   - **Importe a estrutura do banco:** Use o phpMyAdmin (selecione o banco criado > aba Importar > escolha o arquivo `database/kolae.sql`) OU execute o seguinte comando no terminal (substitua `usuario`, `senha`, `kolae_local` pelos seus dados):
@@ -74,8 +74,6 @@ Esta plataforma visa criar uma comunidade engajada onde os usuários podem encon
 ## ☁️ Deploy
 
 O deploy para o ambiente de produção (InfinityFree) é feito automaticamente via **GitHub Actions** sempre que um `push` é realizado na branch `main`. O workflow copia os arquivos via FTP.
-
-![Logo](https://i.postimg.cc/d1d4KhG5/Logo-Preta-preenchimento-branco.png)
 
 ## 📄 Licença
 
