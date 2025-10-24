@@ -67,7 +67,7 @@ Esta plataforma visa criar uma comunidade engajada onde os usuários podem encon
     _(Será pedida a senha do MySQL)_
 
   - Copie `config.example.php` para `config.php` e preencha com as credenciais do **seu banco de dados local** (nome do banco `colae_local`, usuário, senha).
-  - Configure `BASE_URL` e `BASE_DIR_URL` no `index.php` para seu ambiente local (ex: `http://localhost/cola` e `/colae`).
+  - Configure `BASE_URL` e `BASE_DIR_URL` no `index.php` para seu ambiente local (ex: `http://localhost/colae` e `/colae`).
 
 4.  **Acesse o projeto:** Abra seu navegador e acesse `http://localhost/colae` (ou o caminho configurado).
 
