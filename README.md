@@ -8,6 +8,8 @@ Kolae é uma plataforma web desenvolvida para conectar atletas e entusiastas do 
 
 Esta plataforma visa criar uma comunidade engajada onde os usuários podem encontrar facilmente o que precisam para praticar seus esportes favoritos.
 
+![Screenshot do Dashboard do Kolae](https://i.postimg.cc/GmV2qBBF/print-dashboard.png)
+
 **Status Atual:** Versão `v1.0.0` lançada! Funcionalidades básicas de usuário e gerenciamento de locais implementadas.
 
 ## ✨ Funcionalidades Principais (v1.0.0)
