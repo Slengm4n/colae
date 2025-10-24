@@ -2,8 +2,9 @@
 <html lang="pt-br">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
-    <title>Redefinir Senha</title>
+    <title>Kolae</title>
     <style>
         /* Estilos consistentes */
         body {

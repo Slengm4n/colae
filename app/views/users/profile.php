@@ -1,11 +1,8 @@
-<?php
-// No início do seu ficheiro, garanta que a sessão está iniciada.
-// session_start(); 
-?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kolae</title>
