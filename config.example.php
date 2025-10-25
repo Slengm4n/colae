@@ -47,6 +47,16 @@ define('ENCRYPTION_IV', '');
 define('GOOGLE_MAPS_API_KEY', '');
 
 
+// --- Configurações de E-mail (SMTP) ---
+define('SMTP_HOST', '');
+define('SMTP_USER', '');
+define('SMTP_PASS', '');
+define('SMTP_PORT', '');
+define('SMTP_SECURE', '');
+define('SMTP_FROM_EMAIL', '');
+define('SMTP_FROM_NAME', '');
+
+
 // --- CONFIGURAÇÕES REGIONAIS --- //
 /**
  * Define o fuso horário padrão para funções de data e hora da aplicação.
