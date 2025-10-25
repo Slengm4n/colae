@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Locais - Admin Kolae</title>
+    <title>Kolae</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -224,7 +225,7 @@
                     bounds.extend(position);
 
                     marker.addListener('click', () => {
-                        document.getElementById('venue-image').src = venue.image_path ? `<?php echo BASE_URL; ?>/public/uploads/venues/${venue.id}/${venue.image_path}` : 'https://placehold.co/400x200/161B22/E0E0E0?text=Sem+Imagem';
+                        document.getElementById('venue-image').src = venue.image_path ? `<?php echo BASE_URL; ?>/uploads/venues/${venue.id}/${venue.image_path}` : 'https://placehold.co/400x200/161B22/E0E0E0?text=Sem+Imagem';
                         document.getElementById('venue-name').textContent = venue.name;
                         document.getElementById('venue-address').textContent = `${venue.street}, ${venue.number} - ${venue.city}`;
                         document.getElementById('venue-details-link').href = `<?php echo BASE_URL; ?>/admin/quadras/editar/${venue.id}`; // Ajuste o link se necessário

@@ -202,7 +202,8 @@ class VenueController
      */
     private function handleImageUploads(int $venueId)
     {
-        $uploadDir = BASE_PATH . "/public/uploads/venues/" . $venueId . "/";
+        // Linha 203 (CORRIGIDA)
+        $uploadDir = BASE_PATH . "/uploads/venues/" . $venueId . "/";
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }

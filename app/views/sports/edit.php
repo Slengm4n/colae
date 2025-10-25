@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Esporte - Kolae Admin</title>
+    <title>Kolae</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,10 +41,7 @@
                     <i class="fas fa-user-shield text-4xl text-cyan-400"></i>
                 </div>
                 <h2 class="text-xl font-bold">
-                    <?php
-                    $fullName = htmlspecialchars($_SESSION['user_name'] ?? 'Admin');
-                    echo explode(' ', $fullName)[0];
-                    ?>
+                    <?php echo htmlspecialchars($userName ?? 'Admin'); ?>
                 </h2>
                 <p class="text-sm text-gray-400">Admin Kolae</p>
             </div>
@@ -51,7 +49,7 @@
                 <a href="<?php echo BASE_URL; ?>/admin" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors"><i class="fas fa-home w-5 text-center"></i><span>Início</span></a>
                 <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors"><i class="fas fa-users w-5 text-center"></i><span>Usuários</span></a>
                 <a href="<?php echo BASE_URL; ?>/admin/esportes" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold bg-cyan-500/10 text-cyan-400 rounded-lg"><i class="fas fa-running w-5 text-center"></i><span>Esportes</span></a>
-                <a href="<?php echo BASE_URL; ?>/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors"><i class="fas fa-map-marker-alt w-5 text-center"></i><span>Locais</span></a>
+                <a href="<?php echo BASE_URL; ?>/admin/mapa" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-700/50 hover:text-white rounded-lg transition-colors"><i class="fas fa-map-marker-alt w-5 text-center"></i><span>Mapa</span></a>
             </nav>
             <div class="p-4 border-t border-gray-800">
                 <a href="<?php echo BASE_URL; ?>/logout" class="flex items-center gap-4 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sair</span></a>

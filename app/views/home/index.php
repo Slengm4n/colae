@@ -2,32 +2,33 @@
 <html lang="pt-BR">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kolae - Conecte-se pelo Esporte</title>
-
-    <!-- Google Fonts -->
+    <title>Kolae</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome (para ícones) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         /* Estilos customizados que não são facilmente replicáveis com classes de utilidade */
+
+        /* Adiciona a regra de overflow ao HTML e o scroll suave */
+        html {
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            animation: pageFadeIn 0.4s ease-out both;
         }
 
-        /* Animação para o carrossel de parceiros */
         @keyframes scroll {
             0% {
                 transform: translateX(0);
@@ -42,15 +43,34 @@
             animation: scroll 30s linear infinite;
         }
 
-        /* Estilos para a paginação do Swiper */
         .swiper-pagination-bullet {
             background: #B0B0B0;
-            /* Cor secundária */
         }
 
         .swiper-pagination-bullet-active {
             background: #38BDF8;
-            /* Cor de destaque */
+        }
+
+        .vimeo-bg-cover {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -2;
+            width: 100vw;
+            height: 56.25vw;
+            min-height: 100vh;
+            min-width: 177.78vh;
+
+            @keyframes pageFadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
         }
     </style>
 </head>
@@ -60,11 +80,13 @@
     <!-- ==================== CABEÇALHO ==================== -->
     <header class="absolute top-0 left-0 w-full z-30 py-6">
         <div class="container mx-auto px-4 flex justify-between items-center">
-            <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10">
+
+            <img src="<?php echo BASE_URL; ?>/assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10">
+
             <nav class="hidden md:block">
                 <ul class="flex items-center space-x-10">
-                    <li><a href="#" class="font-semibold hover:text-cyan-400 transition-colors">Encontrar</a></li>
-                    <li><a href="#" class="font-semibold hover:text-cyan-400 transition-colors">Sobre Nós</a></li>
+                    <li><a href="#encontrar" class="font-semibold hover:text-cyan-400 transition-colors">Encontrar</a></li>
+                    <li><a href="#sobre-nos" class="font-semibold hover:text-cyan-400 transition-colors">Sobre Nós</a></li>
                 </ul>
             </nav>
             <div class="relative">
@@ -73,15 +95,12 @@
                     <i class="fas fa-user-circle text-lg"></i>
                 </div>
 
-                <!-- Dropdown Menu -->
                 <div id="profile-dropdown" class="absolute top-full right-0 mt-4 w-72 bg-[#1c2128] border border-gray-700 rounded-xl shadow-2xl opacity-0 invisible transform -translate-y-2 transition-all duration-300">
                     <ul class="py-2">
-                        <!-- Links de Navegação para Mobile -->
-                        <li class="md:hidden"><a href="#" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-info-circle w-5 text-center text-gray-400"></i> Sobre Nós</a></li>
+                        <li class="md:hidden"><a href="#sobre-nos" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-info-circle w-5 text-center text-gray-400"></i> Sobre Nós</a></li>
                         <li class="border-t border-gray-700 my-2 md:hidden"></li>
 
-                        <!-- Links Padrão -->
-                        <li><a href="http://localhost/colae/login" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center text-gray-400"></i>Entrar ou Cadastre-se</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>/login" class="flex items-center gap-4 px-5 py-3 text-sm hover:bg-gray-800 transition-colors"><i class="fas fa-sign-out-alt w-5 text-center text-gray-400"></i>Entrar ou Cadastre-se</a></li>
                     </ul>
                 </div>
             </div>
@@ -91,15 +110,17 @@
     <main>
         <!-- ==================== SEÇÃO HERO (VÍDEO) ==================== -->
         <section class="relative h-screen flex items-center justify-center text-center md:justify-start md:text-left p-0">
-            <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-[-2]">
-                <source src="./assets/img/video_bg.mp4" type="video/mp4">
-                Seu navegador não suporta vídeos.
-            </video>
+            <iframe
+                src="https://player.vimeo.com/video/1129399439?background=1&autoplay=1&loop=1&muted=1&autopause=0"
+                class="vimeo-bg-cover"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+            </iframe>
             <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-[-1]"></div>
             <div class="container mx-auto px-4 relative z-10">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold max-w-lg leading-tight mx-auto md:mx-0">Cole com quem ama esporte</h1>
                 <div class="flex flex-wrap gap-4 mt-8 justify-center md:justify-start">
-                    <a href="http://localhost/colae/login" class="py-3 px-8 rounded-full font-semibold transition-all duration-300 bg-white text-black border-2 border-white hover:bg-transparent hover:text-white">Comece de graça</a>
+                    <li><a href="<?php echo BASE_URL; ?>/login" class="py-3 px-8 rounded-full font-semibold transition-all duration-300 bg-white text-black border-2 border-white hover:bg-transparent hover:text-white">Comece de graça</a>
                 </div>
             </div>
         </section>
@@ -140,7 +161,7 @@
         </section>
 
         <!-- ==================== SEÇÃO SOBRE NÓS ==================== -->
-        <section class="py-16 md:py-24">
+        <section id="sobre-nos" class="py-16 md:py-24">
             <div class="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
                 <div class="order-last lg:order-first">
                     <img src="./assets/img/about_us_img.png" alt="Atletas celebrando juntos" class="w-full rounded-xl">
@@ -173,18 +194,18 @@
             <div class="w-full overflow-hidden relative mt-16 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
                 <div class="flex animate-scroll hover:[animation-play-state:paused]">
                     <!-- Logos duplicados para efeito infinito -->
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_fatec.png" alt="Logo Fatec" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_fatec.png" alt="Logo Fatec" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Original_Adidas_logo.svg/1280px-Original_Adidas_logo.svg.png" alt="Logo Adidas" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png" alt="Logo Nike" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leos_de_ferraz.png" alt="Logo Loes de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_fatec.png" alt="Logo Fatec" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_leos_de_ferraz.png" alt="Logo Loes de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_fatec.png" alt="Logo Fatec" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Original_Adidas_logo.svg/1280px-Original_Adidas_logo.svg.png" alt="Logo Adidas" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                     <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png" alt="Logo Nike" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
-                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="./assets/img/logo_leos_de_ferraz.png" alt="Logo Leos de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_atletica_sagui.png" alt="Logo Atletica Sagui" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_brtz.png" alt="Logo BRTZ" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
+                    <div class="w-52 flex-shrink-0 flex items-center justify-center mx-4"><img src="<?php echo BASE_URL; ?>/assets/img/logo_leos_de_ferraz.png" alt="Logo Leos de Ferraz" class="h-12 transition-all duration-300 filter grayscale brightness-75 opacity-70 hover:filter-none hover:opacity-100"></div>
                 </div>
             </div>
         </section>
@@ -194,7 +215,7 @@
     <footer class="bg-gray-800 pt-16 md:pt-20 border-t border-gray-700">
         <div class="container mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-3 gap-12">
             <div class="mb-8 text-center md:text-left">
-                <img src="./assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10 mx-auto md:mx-0">
+                <img src="<?php echo BASE_URL; ?>/assets/img/kolae_branca.png" alt="Logo Kolae" class="h-10 mx-auto md:mx-0">
                 <p class="text-sm text-gray-400 mt-4">Conectando atletas, fortalecendo o esporte.</p>
                 <div class="flex space-x-4 mt-6 justify-center md:justify-start">
                     <a href="#" class="text-xl hover:text-cyan-400 transition-colors" aria-label="Instagram"><i class="fab fa-instagram"></i></a>

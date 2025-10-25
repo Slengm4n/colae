@@ -1,23 +1,11 @@
-<?php
-// Lógica para determinar a mensagem de erro do CPF, se houver, para exibir no popup.
-$cpfError = null;
-if (isset($_GET['error'])) {
-    if ($_GET['error'] === 'cpf_invalid') {
-        $cpfError = 'CPF inválido. Por favor, verifique o número digitado.';
-    } elseif ($_GET['error'] === 'cpf_in_use') {
-        $cpfError = 'Este CPF já está cadastrado em outra conta.';
-    } else {
-        $cpfError = 'Ocorreu um erro ao salvar seu CPF. Tente novamente.';
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+    <link rel="icon" href="https://i.postimg.cc/Ss21pvVJ/Favicon.png" type="image/png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Dashboard - Kolae</title>
+    <title>Kolae</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -128,11 +116,14 @@ if (isset($_GET['error'])) {
                             <a href="<?php echo BASE_URL; ?>/quadras/editar/<?php echo $venue['id']; ?>">
                                 <div class="relative overflow-hidden rounded-xl">
                                     <?php
-                                    $imagePath = BASE_URL . '/public/uploads/venues/' . $venue['id'] . '/' . ($venue['image_path'] ?? '');
+                                    $imagePath = BASE_URL . '/uploads/venues/' . $venue['id'] . '/' . ($venue['image_path'] ?? '');
                                     $placeholder = 'https://placehold.co/600x400/161B22/E0E0E0?text=Sem+Imagem';
                                     $imageSrc = !empty($venue['image_path']) ? $imagePath : $placeholder;
                                     ?>
-                                    <img src="<?php echo $imageSrc; ?>" alt="Foto de <?php echo htmlspecialchars($venue['name']); ?>" class="w-full h-full object-cover aspect-video transform group-hover:scale-105 transition-transform duration-300">
+                                    <img src="<?php echo $imageSrc; ?>"
+                                        alt="Foto de <?php echo htmlspecialchars($venue['name']); ?>"
+                                        class="w-full h-full object-cover aspect-video transform group-hover:scale-105 transition-transform duration-300"
+                                        onerror="this.onerror=null; this.src='<?php echo $placeholder; ?>';">
                                 </div>
                                 <div class="mt-3">
                                     <h3 class="font-bold text-white truncate"><?php echo htmlspecialchars($venue['name']); ?></h3>
