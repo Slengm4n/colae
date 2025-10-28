@@ -47,14 +47,10 @@ define('ENCRYPTION_IV', '');
 define('GOOGLE_MAPS_API_KEY', '');
 
 
-// --- Configurações de E-mail (SMTP) ---
-define('SMTP_HOST', '');
-define('SMTP_USER', '');
-define('SMTP_PASS', '');
-define('SMTP_PORT', '');
-define('SMTP_SECURE', '');
-define('SMTP_FROM_EMAIL', '');
-define('SMTP_FROM_NAME', '');
+/**
+ * Chave JWT
+ */
+define('JWT_SECRET', 'SUA_CHAVE_SECRETA_SUPER_LONGA_E_ALEATORIA_AQUI');
 
 
 // --- CONFIGURAÇÕES REGIONAIS --- //
