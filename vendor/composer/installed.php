@@ -3,7 +3,7 @@
         'name' => 'joao_slengman/kolae',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '016dff8165d72461aeb130794491a12882421c87',
+        'reference' => 'a2ca556fdd15899bf9ce8d3e56920c7b6307f705',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'joao_slengman/kolae' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '016dff8165d72461aeb130794491a12882421c87',
+            'reference' => 'a2ca556fdd15899bf9ce8d3e56920c7b6307f705',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

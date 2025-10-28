@@ -151,7 +151,40 @@ class VenueController
             ];
             Venue::update($id, $venueData);
 
-            // Lógica para upload de novas imagens (opcional)
+            // --- INÍCIO DA LÓGICA DE IMAGEM ---
+
+            // 3. Deleta imagens marcadas para exclusão
+            if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
+                $uploadDir = BASE_PATH . "/uploads/venues/" . $id . "/";
+
+                foreach ($_POST['delete_images'] as $imageId) {
+                    // Assumindo que VenueImage::findById() existe e retorna a imagem
+                    $image = VenueImage::findById((int)$imageId); 
+                    
+                    if ($image) {
+                        // Deleta o arquivo físico do servidor
+                        // Assumindo que o banco guarda o nome do arquivo na coluna 'file_name' ou 'url'
+                        $fileName = $image['file_name'] ?? $image['url']; 
+                        $filePath = $uploadDir . $fileName;
+                        
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+
+                        // Deleta o registro do banco de dados
+                        // Assumindo que VenueImage::delete() existe
+                        VenueImage::delete((int)$imageId);
+                    }
+                }
+            }
+
+            // 4. Lógica para upload de novas imagens (reutilizando sua função)
+            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                $this->handleImageUploads($id);
+            }
+            
+            // --- FIM DA LÓGICA DE IMAGEM ---
+
 
             header('Location: ' . BASE_URL . '/dashboard?status=venue_updated');
             exit;
@@ -219,6 +252,7 @@ class VenueController
 
                 // Aqui você pode adicionar a otimização de imagem se tiver um ImageHelper
                 if (move_uploaded_file($tmpName, $destinationPath)) {
+                    // Salva apenas o NOME DO ARQUIVO no banco
                     VenueImage::create($venueId, $newFileName);
                 }
             }
