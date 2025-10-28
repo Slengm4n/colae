@@ -9,6 +9,11 @@ use App\Controllers\UserController;
 use App\Controllers\VenueController;
 use App\Controllers\SportController;
 use App\Controllers\AdminController;
+use App\Controllers\AuthApiController;
+use App\Controllers\VenueApiController;
+use App\Controllers\SportApiController;
+use App\Controllers\GameApiController;
+
 
 // Inicia a sessão para toda a aplicação.
 session_start();
@@ -105,6 +110,24 @@ $router->group('/admin', function ($router) {
         $router->post('/excluir/{id}', [SportController::class, 'delete']);
     });
 });
+
+// --- ROTAS DA API V1 ---
+$router->group('/api/v1', function ($router) {
+    // Autenticação
+    $router->post('/auth/login', [AuthApiController::class, 'login']);
+
+    // Quadras (Venues)
+    $router->get('/venues', [VenueApiController::class, 'getActiveVenuesForMap']);
+    // $router->get('/venues/{id}', [VenueApiController::class, 'getVenueDetails']); // Exemplo futuro
+
+    // Esportes
+    $router->get('/sports', [SportApiController::class, 'getActiveSports']);
+
+    // Partidas (Matches) - Requer autenticação
+    $router->post('/games', [GameApiController::class, 'createGame']);
+    // $router->get('/matches/venue/{venueId}', [MatchApiController::class, 'getMatches']); // Exemplo futuro
+});
+
 
 // Executa o roteador
 $router->dispatch();

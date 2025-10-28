@@ -1,6 +1,12 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # ---- ADICIONE ESTAS LINHAS ----
+    # Permite que o cabeçalho Authorization seja passado para o PHP
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+    # ---- FIM DAS LINHAS ADICIONADAS ----
+
     # --- Bloco de Regra para LOCALHOST ---
     # Se o Host for "localhost"
     RewriteCond %{HTTP_HOST} ^localhost$
