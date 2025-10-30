@@ -78,7 +78,7 @@ class Venue
                          (SELECT vi.file_path FROM venue_images vi WHERE vi.venue_id = v.id ORDER BY vi.id DESC LIMIT 1) as image_path
                   FROM venues v
                   LEFT JOIN addresses a ON v.address_id = a.id
-                  WHERE v.user_id = :user_id
+                  WHERE v.user_id = :user_id AND v.status = 'available'
                   ORDER BY v.created_at DESC";
         // --- FIM DA CORREÇÃO ---
         $stmt = $pdo->prepare($query);

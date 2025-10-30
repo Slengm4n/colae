@@ -1,7 +1,10 @@
 <?php
 // Garante que a sessão está iniciada e os dados do local existem.
-// session_start();
 $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
+
+// --- CORREÇÃO DE ROTA ---
+// Pega o prefixo que o VenueController::edit() enviou.
+$prefix = $data['routePrefix'] ?? '/dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -53,7 +56,7 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                 <a href="<?php echo BASE_URL; ?>/" class="text-2xl font-bold tracking-widest text-white">KOLAE</a>
 
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="<?php echo BASE_URL; ?>/dashboard" class="font-semibold text-cyan-400 transition-colors">Meu Painel</a>
+                    <a href="<?php echo BASE_URL . $prefix; ?>" class="font-semibold text-cyan-400 transition-colors">Meu Painel</a>
                 </nav>
 
                 <div class="relative">
@@ -86,9 +89,9 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                     <p class="text-gray-400 mt-2">Os dados do local não foram encontrados.</p>
                 </div>
             <?php else: ?>
-                <?php $prefix = $data['routePrefix'] ?? '/dashboard'; ?>
 
                 <form id="venue-form" action="<?php echo BASE_URL . $prefix; ?>/quadras/atualizar/<?php echo $venue['id']; ?>" method="POST" enctype="multipart/form-data" class="w-full h-full flex flex-col space-y-12">
+                    
                     <input type="hidden" name="address_id" value="<?php echo $venue['address_id']; ?>">
                     <input type="hidden" id="floor_type_input" name="floor_type" value="<?php echo htmlspecialchars($venue['floor_type']); ?>">
                     <input type="hidden" id="court_capacity_input" name="court_capacity" value="<?php echo htmlspecialchars($venue['court_capacity']); ?>">
@@ -198,22 +201,11 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                         </div>
 
                         <div id="preview-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-
-                            <?php // --- ESTE É O BLOCO MAIS IMPORTANTE --- 
-                            ?>
                             <?php
-                            // Loop para exibir imagens existentes
                             if (!empty($venue['images']) && is_array($venue['images'])) {
                                 foreach ($venue['images'] as $image) {
-
-                                    // 1. Constrói a URL pública correta
-                                    // Ex: http://localhost/colae/uploads/venues/2/foto.png
                                     $imgUrl = BASE_URL . '/uploads/venues/' . $venue['id'] . '/' . htmlspecialchars($image['file_path']);
-
-                                    // 2. Pega o ID da imagem para o botão 'delete'
                                     $imgId = htmlspecialchars($image['id']);
-
-                                    // 3. Exibe a imagem existente e o botão de deletar
                                     echo '<div class="relative existing-image-preview">';
                                     echo '  <img src="' . $imgUrl . '" alt="Foto do local" class="w-full h-32 object-cover rounded-lg">';
                                     echo '  <button type="button" class="delete-existing-image absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg" data-image-id="' . $imgId . '">&times;</button>';
@@ -221,15 +213,35 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                                 }
                             }
                             ?>
-                            <?php // Novas imagens (previews do JS) serão adicionadas aqui dinamicamente 
-                            ?>
-
                         </div>
                     </section>
 
-                <?php endif; ?>
                 </form>
-        </main>
+
+                <section id="section-danger-zone" class="mt-12"> <h2 class="text-3xl font-bold text-red-500 mb-6">Área de Perigo</h2>
+                    
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">Desativar esta quadra</h3>
+                            <p class="text-sm text-gray-400 max-w-md mt-1">
+                                Uma vez desativada, a quadra não aparecerá mais nos resultados de busca e não poderá ser reservada.
+                            </p>
+                        </div>
+                        
+                        <form action="<?php echo BASE_URL . $prefix; ?>/quadras/excluir/<?php echo $venue['id']; ?>" 
+                              method="POST" 
+                              class="mt-4 sm:mt-0"
+                              onsubmit="return confirm('Tem a certeza que deseja desativar esta quadra?');">
+                            
+                            <button type="submit" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                                Desativar Quadra
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+            <?php endif; ?> </main>
 
         <footer class="w-full p-4 border-t border-gray-800 sticky bottom-0 bg-[#0D1117] z-10">
             <div class="max-w-3xl mx-auto flex justify-end">
@@ -248,7 +260,7 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
             // --- Lógica dos Contadores (Capacidade) ---
             document.querySelectorAll('.counter-input').forEach(counter => {
                 const valueSpan = counter.querySelector('.counter-value');
-                const targetInputId = counter.dataset.targetInput; // ID do input hidden
+                const targetInputId = counter.dataset.targetInput;
                 const hiddenInput = document.getElementById(targetInputId);
                 const minValue = parseInt(counter.dataset.minValue, 10);
                 let value = parseInt(valueSpan.textContent, 10);
@@ -256,12 +268,12 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                 counter.querySelector('.minus').addEventListener('click', () => {
                     if (value > minValue) value--;
                     valueSpan.textContent = value;
-                    hiddenInput.value = value; // Atualiza o input hidden
+                    if(hiddenInput) hiddenInput.value = value;
                 });
                 counter.querySelector('.plus').addEventListener('click', () => {
                     value++;
                     valueSpan.textContent = value;
-                    hiddenInput.value = value; // Atualiza o input hidden
+                    if(hiddenInput) hiddenInput.value = value;
                 });
             });
 
@@ -273,7 +285,7 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                 card.addEventListener('click', () => {
                     optionCards.forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    floorTypeInput.value = card.dataset.value; // Atualiza o input hidden
+                    floorTypeInput.value = card.dataset.value;
                 });
             });
 
@@ -284,36 +296,23 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
 
             document.querySelectorAll('.checkbox-card').forEach(card => {
                 const checkbox = card.querySelector('input[type="checkbox"]');
-
-                // Função para atualizar o estado visual
                 const updateVisual = (isChecked) => {
                     card.classList.toggle('selected', isChecked);
-
                     if (card.id === 'leisure-area-checkbox-card') {
                         leisureCapacityContainer.classList.toggle('hidden', !isChecked);
                         if (!isChecked) {
-                            // Zera a capacidade se a área de lazer for desmarcada
                             leisureCapacityValueSpan.textContent = '0';
                             leisureCapacityInput.value = '0';
                         }
                     }
                 };
-
-                // **CORREÇÃO DO BUG DE CLIQUE DUPLO**
                 card.addEventListener('click', (e) => {
-                    // Se o clique foi no próprio input, deixa o navegador agir
                     if (e.target.tagName === 'INPUT') {
                         updateVisual(checkbox.checked);
                         return;
                     }
-
-                    // Previne o comportamento padrão do <label> (que é clicar no input)
                     e.preventDefault();
-
-                    // Inverte manualmente o estado do checkbox
                     checkbox.checked = !checkbox.checked;
-
-                    // Atualiza o visual
                     updateVisual(checkbox.checked);
                 });
             });
@@ -338,42 +337,29 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                 }
             });
 
-            // --- Lógica de Upload/Preview de Imagens (COMPLETA) ---
+            // --- Lógica de Upload/Preview de Imagens ---
             const dropArea = document.getElementById('drop-area');
             const fileInput = document.getElementById('images');
             const previewContainer = document.getElementById('preview-container');
-            // DataTransfer é usado para armazenar os arquivos que serão enviados
             const newFilesDataTransfer = new DataTransfer();
 
-            // Previne comportamentos padrão do navegador
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
+                if(dropArea) dropArea.addEventListener(eventName, preventDefaults, false);
                 document.body.addEventListener(eventName, preventDefaults, false);
             });
-
-            // Adiciona/Remove classe de destaque
             ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+                if(dropArea) dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
             });
             ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+                if(dropArea) dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
             });
+            if(dropArea) dropArea.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files), false);
+            if(fileInput) fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-            // Lida com arquivos soltos
-            dropArea.addEventListener('drop', (e) => {
-                handleFiles(e.dataTransfer.files);
-            }, false);
-
-            // Lida com arquivos do input
-            fileInput.addEventListener('change', (e) => {
-                handleFiles(e.target.files);
-            });
-
-            // Função principal para processar arquivos
             function handleFiles(files) {
                 for (const file of files) {
                     if (file.type.startsWith('image/') && !isFileInTransfer(file.name)) {
@@ -381,15 +367,13 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                         previewNewFile(file);
                     }
                 }
-                // Atualiza o input real com os arquivos do DataTransfer
-                fileInput.files = newFilesDataTransfer.files;
+                if(fileInput) fileInput.files = newFilesDataTransfer.files;
             }
 
             function isFileInTransfer(fileName) {
                 return Array.from(newFilesDataTransfer.files).some(f => f.name === fileName);
             }
 
-            // Cria o preview para novas imagens
             function previewNewFile(file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -399,90 +383,69 @@ $venue = $data['venue'] ?? null; // A variável $data virá do seu controller
                         <img src="${e.target.result}" alt="Preview" class="w-full h-32 object-cover rounded-lg">
                         <button type="button" class="delete-new-image absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg" data-file-name="${file.name}">&times;</button>
                     `;
-                    previewContainer.appendChild(previewDiv);
+                    if(previewContainer) previewContainer.appendChild(previewDiv);
                 };
                 reader.readAsDataURL(file);
             }
 
-            // Lida com cliques nos botões de exclusão
-            previewContainer.addEventListener('click', function(e) {
-                // Excluir NOVA imagem (preview)
+            if(previewContainer) previewContainer.addEventListener('click', function(e) {
                 if (e.target.classList.contains('delete-new-image')) {
                     e.preventDefault();
                     const fileName = e.target.dataset.fileName;
-
-                    // Remove do DataTransfer
                     const newFiles = Array.from(newFilesDataTransfer.files);
                     const filteredFiles = newFiles.filter(file => file.name !== fileName);
-
                     newFilesDataTransfer.items.clear();
                     filteredFiles.forEach(file => newFilesDataTransfer.items.add(file));
-                    fileInput.files = newFilesDataTransfer.files;
-
-                    // Remove do DOM
+                    if(fileInput) fileInput.files = newFilesDataTransfer.files;
                     e.target.parentElement.remove();
                 }
 
-                // Excluir IMAGEM EXISTENTE
                 if (e.target.classList.contains('delete-existing-image')) {
                     e.preventDefault();
                     const imageId = e.target.dataset.imageId;
-
-                    // Adiciona um input hidden para o back-end saber qual excluir
                     const deleteInput = document.createElement('input');
                     deleteInput.type = 'hidden';
-                    deleteInput.name = 'delete_images[]'; // Envia como um array
+                    deleteInput.name = 'delete_images[]';
                     deleteInput.value = imageId;
                     form.appendChild(deleteInput);
-
-                    // Remove do DOM
                     e.target.parentElement.remove();
                 }
             });
 
-
             // --- Pré-preenchimento Visual ---
             function prefillVisuals() {
-                // Pré-seleciona o tipo de piso
                 const floorCard = document.querySelector(`.option-card[data-value="${venueData.floor_type}"]`);
                 if (floorCard) floorCard.classList.add('selected');
-
-                // Pré-seleciona as comodidades
                 document.querySelectorAll('.checkbox-card input').forEach(checkbox => {
                     if (checkbox.checked) {
                         checkbox.parentElement.classList.add('selected');
-                        // Mostra a capacidade de lazer se estiver marcada
-                        if (checkbox.name === 'has_leisure_area') {
+                        if (checkbox.name === 'has_leisure_area' && leisureCapacityContainer) {
                             leisureCapacityContainer.classList.remove('hidden');
                         }
                     }
                 });
             }
-
             prefillVisuals();
-        });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Lógica do menu dropdown do cabeçalho
+            // --- Lógica do Menu Dropdown ---
             const userMenuButton = document.getElementById('user-menu-button');
             const profileDropdown = document.getElementById('profile-dropdown');
-            if (userMenuButton) {
+            if (userMenuButton && profileDropdown) {
                 userMenuButton.addEventListener('click', (event) => {
                     event.stopPropagation();
                     profileDropdown.classList.toggle('opacity-0');
                     profileDropdown.classList.toggle('invisible');
                     profileDropdown.classList.toggle('-translate-y-2');
                 });
-            }
-            window.addEventListener('click', (event) => {
-                if (profileDropdown && !profileDropdown.classList.contains('invisible')) {
-                    if (!profileDropdown.contains(event.target) && !userMenuButton.contains(event.target)) {
-                        profileDropdown.classList.add('opacity-0', 'invisible', '-translate-y-2');
+                window.addEventListener('click', (event) => {
+                    if (!profileDropdown.classList.contains('invisible')) {
+                        if (!profileDropdown.contains(event.target) && !userMenuButton.contains(event.target)) {
+                            profileDropdown.classList.add('opacity-0', 'invisible', '-translate-y-2');
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
 </body>
-
 </html>

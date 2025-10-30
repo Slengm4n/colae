@@ -40,7 +40,8 @@ class VenueController
     public function create()
     {
         $this->checkCpfStatus(); // Admin também precisa de CPF para criar
-        $data = ['userName' => $_SESSION['user_name'] ?? 'Usuário'];
+        $routePrefix = AuthHelper::isAdmin() ? '/admin' : '/dashboard';
+        $data = ['userName' => $_SESSION['user_name'] ?? 'Usuário','routePrefix' => $routePrefix];
         ViewHelper::render('venues/create', $data);
     }
 
