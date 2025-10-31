@@ -72,16 +72,15 @@ $router->group('/dashboard', function ($router) {
     $router->post('/perfil/atualizar', [UserController::class, 'updateProfile']);
     $router->get('/perfil/seguranca', [UserController::class, 'showSecurityPage']);
     $router->post('/perfil/seguranca/atualizar', [UserController::class, 'updatePasswordFromProfile']);
-});
 
-// --- ROTAS DE QUADRAS DO UTILIZADOR ---
-$router->group('/quadras', function ($router) {
-    $router->get('/', [VenueController::class, 'index']);
-    $router->get('/criar', [VenueController::class, 'create']);
-    $router->post('/salvar', [VenueController::class, 'store']);
-    $router->get('/editar/{id}', [VenueController::class, 'edit']);
-    $router->post('/atualizar/{id}', [VenueController::class, 'update']);
-    $router->post('/excluir/{id}', [VenueController::class, 'delete']);
+    // --- ROTAS DE QUADRAS DO UTILIZADOR ---
+    $router->group('/quadras', function ($router) {
+        $router->get('/criar', [VenueController::class, 'create']);
+        $router->post('/salvar', [VenueController::class, 'store']);
+        $router->get('/editar/{id}', [VenueController::class, 'edit']);
+        $router->post('/atualizar/{id}', [VenueController::class, 'update']);
+        $router->post('/excluir/{id}', [VenueController::class, 'delete']);
+    });
 });
 
 
@@ -108,6 +107,16 @@ $router->group('/admin', function ($router) {
         $router->get('/editar/{id}', [SportController::class, 'edit']);
         $router->post('/atualizar', [SportController::class, 'update']);
         $router->post('/excluir/{id}', [SportController::class, 'delete']);
+    });
+
+    // --- ROTAS DE QUADRAS DO UTILIZADOR ---
+    $router->group('/quadras', function ($router) {
+        $router->get('/', [VenueController::class, 'index']);
+        $router->get('/criar', [VenueController::class, 'create']);
+        $router->post('/salvar', [VenueController::class, 'store']);
+        $router->get('/editar/{id}', [VenueController::class, 'edit']);
+        $router->post('/atualizar/{id}', [VenueController::class, 'update']);
+        $router->post('/excluir/{id}', [VenueController::class, 'delete']);
     });
 });
 
