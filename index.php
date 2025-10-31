@@ -1,7 +1,5 @@
 <?php
 
-// --- Importação dos Controllers ---
-// TODO O BLOCO DE 'use' DEVE VIR PRIMEIRO!
 use App\Core\Router;
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
@@ -9,8 +7,12 @@ use App\Controllers\UserController;
 use App\Controllers\VenueController;
 use App\Controllers\SportController;
 use App\Controllers\AdminController;
+use App\Controllers\AuthApiController;
+use App\Controllers\VenueApiController;
+use App\Controllers\SportApiController;
+use App\Controllers\GameApiController;
 
-// Inicia a sessão para toda a aplicação.
+
 session_start();
 
 // --- Constantes Globais ---
@@ -28,12 +30,11 @@ $host = $_SERVER['HTTP_HOST'];
 if ($host == 'localhost') {
     // --- AMBIENTE LOCAL (SEU PC) ---
     define('BASE_URL', 'http://localhost/colae');
-    define('BASE_DIR_URL', '/colae'); // <-- A NOVA CONSTANTE PARA O ROUTER
-
+    define('BASE_DIR_URL', '/colae');
 } else {
-    // --- AMBIENTE DE PRODUÇÃO (InfinityFree) ---
+    // --- AMBIENTE DE PRODUÇÃO ---
     define('BASE_URL', $protocol . '://' . $host);
-    define('BASE_DIR_URL', ''); // <-- A NOVA CONSTANTE PARA O ROUTER (vazio)
+    define('BASE_DIR_URL', '');
 }
 
 /* -------------------------------------- */
@@ -57,6 +58,10 @@ $router->post('/login/authenticate', [AuthController::class, 'authenticate']);
 $router->get('/register', [AuthController::class, 'register']);
 $router->post('/register/store', [AuthController::class, 'store']);
 $router->get('/logout', [AuthController::class, 'logout']);
+$router->get('/forgot-password', [AuthController::class, 'showForgotPasswordForm']);
+$router->post('/forgot-password', [AuthController::class, 'handleForgotPassword']);
+$router->get('/reset-password', [AuthController::class, 'showResetForm']);
+$router->post('/reset-password', [AuthController::class, 'handleResetPassword']);
 
 // --- ROTAS DO PAINEL DO UTILIZADOR ---
 $router->group('/dashboard', function ($router) {
@@ -114,6 +119,24 @@ $router->group('/admin', function ($router) {
         $router->post('/excluir/{id}', [VenueController::class, 'delete']);
     });
 });
+
+// --- ROTAS DA API V1 ---
+$router->group('/api/v1', function ($router) {
+    // Autenticação
+    $router->post('/auth/login', [AuthApiController::class, 'login']);
+
+    // Quadras (Venues)
+    $router->get('/venues', [VenueApiController::class, 'getActiveVenuesForMap']);
+    // $router->get('/venues/{id}', [VenueApiController::class, 'getVenueDetails']); // Exemplo futuro
+
+    // Esportes
+    $router->get('/sports', [SportApiController::class, 'getActiveSports']);
+
+    // Partidas (Matches) - Requer autenticação
+    $router->post('/games', [GameApiController::class, 'createGame']);
+    // $router->get('/matches/venue/{venueId}', [MatchApiController::class, 'getMatches']); // Exemplo futuro
+});
+
 
 // Executa o roteador
 $router->dispatch();
